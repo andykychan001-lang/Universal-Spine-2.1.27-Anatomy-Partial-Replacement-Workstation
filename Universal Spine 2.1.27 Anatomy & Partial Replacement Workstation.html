@@ -1,0 +1,4358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Universal Spine 2.1.27 Anatomy & Partial Replacement Workstation (1:1 Lossless Compliant Edition)</title>
+<style>
+  body { background: #141414; color: #eee; font-family: "Segoe UI", sans-serif; padding: 15px; margin: 0; }
+  h2 { margin: 0 0 10px 0; color: #f0c674; font-size: 18px; }
+  .panel { background: #222; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #3a3a3a; }
+  .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 8px; }
+  .ctrl { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+  select, input[type="text"], input[type="number"] { background: #111; color: #fff; border: 1px solid #555; padding: 5px 8px; border-radius: 4px; font-size: 12px; }
+  button { background: #28a745; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
+  button:hover { background: #218838; }
+  button:disabled { background: #333 !important; color: #777 !important; border-color: #444 !important; cursor: not-allowed; }
+  button.orange { background: #e67e22; }
+  button.orange:hover { background: #d35400; }
+  button.purple { background: #8e44ad; }
+  button.purple:hover { background: #732d91; }
+  button.cyan-btn { background: #006d78; padding: 7px 12px; border: 2px solid #00c7be; font-size: 12px; }
+  button.cyan-btn:hover { background: #008b99; }
+  button.cyan-btn.active { background: #00c7be; color: #000; border-color: #fff; box-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+  .brush-btn { background: #333; border: 2px solid #555; padding: 6px 12px; border-radius: 5px; color: #fff; cursor: pointer; font-size: 12px; }
+  .brush-btn.active { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.6); }
+  .mode-box { display: flex; align-items: center; gap: 10px; background: #292211; padding: 6px 12px; border-radius: 6px; border: 2px solid #f0c674; }
+  .mode-box.drag-active { background: #332400; border-color: #ff9800; box-shadow: 0 0 10px rgba(255, 152, 0, 0.45); }
+  .mode-box.putty-active { background: #0f292e; border-color: #00e5ff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.45); }
+  .fringe-box { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: #182229; padding: 7px 12px; border-radius: 6px; border: 1px solid #2e4d5e; }
+  .export-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #142618; padding: 7px 12px; border-radius: 6px; border: 1px solid #2e6b3a; }
+  .host-mapping-bar { background: #1d1829; padding: 10px 12px; border-radius: 6px; border: 1px solid #5a3d7a; margin-top: 6px; font-size: 12px; }
+  .zone-cards-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .zone-item-card { display: flex; align-items: center; gap: 6px; background: #14111c; padding: 6px 10px; border-radius: 6px; border: 1px solid #45335c; }
+  .zone-color-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 1px solid #fff; flex-shrink: 0; }
+  .del-zone-btn { background: #5a1e1e; color: #ff9999; border: 1px solid #8b2e2e; padding: 3px 7px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+  .del-zone-btn:hover { background: #8b2e2e; color: #fff; }
+  .workspace { display: flex; gap: 15px; flex-wrap: wrap; }
+  .card { background: #111; border: 1px solid #444; border-radius: 8px; padding: 10px; flex: 1; min-width: 450px; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+  .card h3 { margin: 0; font-size: 14px; color: #8abeb7; }
+  .zoom-controls { display: flex; align-items: center; gap: 8px; font-size: 12px; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; border: 1px solid #333; flex-wrap: wrap; }
+  .ref-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; background: #192226; padding: 8px 10px; border-radius: 6px; border: 1px solid #2d434d; margin-bottom: 8px; }
+  .b-tool-bar { display: flex; flex-direction: column; gap: 8px; font-size: 12px; background: #171f1c; padding: 8px 10px; border-radius: 6px; border: 1px solid #2b473e; margin-bottom: 8px; }
+  .layer-pill { display: inline-flex; align-items: center; gap: 4px; background: #111; padding: 3px 8px; border-radius: 12px; border: 1px solid #444; cursor: pointer; user-select: none; font-size: 11px; }
+  .layer-pill.off { opacity: 0.45; border-color: #222; }
+  .sub-btn { background: #444; padding: 4px 10px; font-size: 12px; border: 1px solid #666; border-radius: 4px; color: #fff; cursor: pointer; }
+  .sub-btn:hover { background: #555; }
+  .sub-btn.pan-active { background: #007bff; border-color: #66b0ff; }
+  .sub-btn.tex-drag-active { background: #e67e22; border-color: #ffbe76; color: #000; font-weight: bold; }
+  .joint-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #191919; padding: 8px 12px; border-radius: 6px; border: 1px solid #383838; }
+  .joint-summary { font-size: 12px; color: #aaa; background: #111; padding: 4px 8px; border-radius: 4px; border: 1px solid #2e2e2e; }
+  .dim-badge { color: #ffeb3b; font-weight: bold; font-size: 12px; padding: 5px 10px; background: #262110; border-radius: 4px; border: 1px solid #66581f; }
+  #statusMsg { color: #4cd964; font-weight: bold; font-size: 12px; padding: 4px 8px; background: #1a1a1a; border-radius: 4px; border: 1px solid #333; }
+  canvas { max-width: 100%; height: auto; border: 1px solid #333; background-image: linear-gradient(45deg, #1c1c1c 25%, transparent 25%), linear-gradient(-45deg, #1c1c1c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1c1c 75%), linear-gradient(-45deg, transparent 75%, #1c1c1c 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+</style>
+</head>
+<body>
+
+<h2>Universal Spine 2.1.27 Anatomy &amp; Partial Replacement Workstation (Default 0-Filter Lossless Pass-Through + Native 1:1 Spec + HD Texture Support)</h2>
+
+<div class="panel">
+  <div class="row">
+    <div class="ctrl">
+      <label><strong>1. Load Target Character Image (Default 0-Filter 100% Raw Pass-Through):</strong></label>
+      <input type="file" id="charInput" accept="image/*">
+    </div>
+
+    <div class="fringe-box">
+      <div class="ctrl">
+        <label title="Default 0 (No intervention). Only increase manually if the image has semi-transparent edge artifacts">
+          <strong style="color:#00e5ff;">✂️ Optional: Edge Alpha Cutoff (0=Off): <span id="alphaThreshVal" style="color:#ffeb3b;">0</span></strong>
+        </label>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="range" id="alphaThreshold" min="0" max="255" step="1" value="0" style="width:110px;">
+          <input type="number" id="alphaThresholdNum" min="0" max="255" value="0" style="width:45px;">
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <label title="Default 0 (No intervention). Only strips light/white border halos while 100% protecting pitch-black ink outlines">
+          <strong style="color:#4cd964;">🧼 Optional: Edge White Defringe (0=Off): <span id="defringeVal" style="color:#ffeb3b;">0</span></strong>
+        </label>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="range" id="defringeStrength" min="0" max="255" step="1" value="0" style="width:110px;">
+          <input type="number" id="defringeStrengthNum" min="0" max="255" value="0" style="width:45px;">
+        </div>
+      </div>
+
+      <div class="ctrl" style="gap:3px;">
+        <label style="cursor:pointer; user-select:none;" title="Default Off. Only check when loading an image with an unremoved solid background">
+          <input type="checkbox" id="autoCornerBgCb"> Flood-Fill Exterior Solid BG to Alpha
+        </label>
+        <label style="cursor:pointer; user-select:none; color:#8abeb7;" title="Default Off. Only check if you want semi-transparent outer contour pixels forced to 255 opaque">
+          <input type="checkbox" id="hardAlphaEdgeCb"> Harden Outer Contour Edge
+        </label>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <label><strong>Target Image Working Scale (70% - 150%): <span id="charScaleVal" style="color:#00e5ff;">100%</span></strong></label>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <input type="range" id="charScaleSlider" min="70" max="150" step="1" value="100" style="width:100px;">
+        <button type="button" class="sub-btn" id="charReset100Btn">Reset 100%</button>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <label><strong style="color:#f0c674;">📐 1:1 Canvas Space &amp; Origin:</strong></label>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <select id="canvasSizeSelect" title="Expand canvas workspace for oversized HD samples (e.g. large weapons/FX) without compressing pixels">
+          <option value="900x750" selected>Standard Canvas (900 × 750)</option>
+          <option value="1400x1100">Large Canvas (1400 × 1100)</option>
+          <option value="2000x1600">XL Canvas (2000 × 1600)</option>
+        </select>
+        <select id="rootPresetSelect" title="Switch Spine (0,0) origin position on canvas">
+          <option value="foot" selected>👣 Foot Origin (Character Walk/Combat/Skill)</option>
+          <option value="center">🎯 Center Origin (Floating FX / Projectile)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <label style="cursor:pointer; user-select:none; margin-top:14px;">
+        <input type="checkbox" id="showDimRulerCb" checked> <strong>Show Bounds &amp; Rulers</strong>
+      </label>
+    </div>
+
+    <span class="dim-badge" id="charDimBadge">📐 Target Char Bounds: No Image Loaded</span>
+    <span id="statusMsg">Status: Default 0-Filter Lossless Mode Ready. Please load Master Host (.png + .atlas + .skel) and target image...</span>
+  </div>
+
+  <!-- 【Part Zones & Host Slot Binding Manager】 -->
+  <div class="host-mapping-bar">
+    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+      <strong style="color:#d7b8ff;">🧬 Part Zones &amp; Host Slot Binding Manager (1:1 Native Spec):</strong>
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+        <button type="button" class="sub-btn" id="addZoneBtn" style="background:#28a745; border-color:#4cd964; padding:5px 10px; font-weight:bold;">➕ Add Zone &amp; Joint</button>
+        <button type="button" class="sub-btn" id="autoGenZonesFromHostBtn" style="background:#006d78; border-color:#00c7be; padding:5px 10px;" title="Automatically create zones matching valid regions in the Host .atlas">⚡ Auto-Generate Zones from Host Slots</button>
+        <button type="button" class="sub-btn" id="snapPivotsToHostBtn" style="background:#5a3d7a; border-color:#9b6bcc; padding:5px 10px;">🧲 Snap Yellow Pivots to Host Bones</button>
+
+        <div style="display:flex; align-items:center; gap:4px; background:#14111c; padding:4px 8px; border-radius:4px; border:1px solid #5a3d7a;">
+          <strong style="color:#ffeb3b;">Unmapped Slot Policy:</strong>
+          <select id="unmappedSlotPolicySelect" title="Determines how unmapped host slots are handled upon export">
+            <option value="passthrough" selected>🔒 Keep Host Original (Partial Edit Pass-Through)</option>
+            <option value="transparent_1x1">🛡️ Convert to 1x1 Transparent Anchor (Hide Unused, Keep shadow)</option>
+          </select>
+        </div>
+
+        <label style="cursor:pointer; user-select:none;" title="Default Off to strictly enforce Spine 2.1.27 positive offset and size <= orig compliance. Only check manually for pure Region slots that need to exceed original bounds">
+          <input type="checkbox" id="unclippedBakeCb"> <span style="color:#f0c674;">🔓 Allow Unclipped Bounds (Experimental Region Only)</span>
+        </label>
+        <label style="cursor:pointer; user-select:none;">
+          <input type="checkbox" id="showHostUvBoundsCb" checked> <span style="color:#d7b8ff;">Show Host UV Bounds</span>
+        </label>
+      </div>
+    </div>
+    <div id="zoneCardsContainer" class="zone-cards-grid"></div>
+  </div>
+
+  <!-- 【Joint Putty Toolkit + Custom Export Name & 3-in-1 Download】 -->
+  <div class="row" style="margin-top:8px;">
+    <div class="joint-box">
+      <div class="ctrl">
+        <label><strong style="color:#00e5ff;">🧱 Selected Part (Shared by Putty / Texture Tune):</strong></label>
+        <select id="jointSelect"></select>
+      </div>
+      <button type="button" class="cyan-btn" id="puttyPaintBtn">🧱 Paint Putty</button>
+      <button type="button" class="cyan-btn" id="puttyEraseBtn">🧹 Putty Eraser</button>
+      <button type="button" class="purple" id="autoColorBtn" style="padding:7px 12px; font-size:12px;">🎨 Auto-Color Putty</button>
+      <button type="button" class="sub-btn" id="whitePuttyViewBtn" style="padding:6px 10px;">⚪ Reset White View</button>
+      <button type="button" class="sub-btn" id="clearPuttyBtn" style="background:#5a1e1e; border-color:#8b2e2e; padding:6px 10px;">🗑️ Clear Part Putty</button>
+      <label style="cursor:pointer; user-select:none; font-size:12px;">
+        <input type="checkbox" id="showPuttyOverlayCb" checked> Show Putty Overlay
+      </label>
+      <span class="joint-summary" id="jointSummaryText">Putty Status: None Painted</span>
+    </div>
+
+    <div class="ctrl">
+      <label><input type="checkbox" id="showColorZones" checked> <strong>Show Zone Color Mask</strong></label>
+    </div>
+
+    <button class="orange" id="animBtn">▶ Play Part Motion Test</button>
+
+    <div class="export-box">
+      <div class="ctrl">
+        <label title="Changing this name automatically updates the first-line image reference inside .atlas to prevent white-box issues">
+          <strong style="color:#4cd964;">📝 Custom Export Base Name (1:1 Lossless Native):</strong>
+        </label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="exportNameInput" value="character.sprite.walk" style="width:190px; font-weight:bold; color:#ffeb3b; border-color:#4cd964;" placeholder="e.g. EosScourge.sprite.combat">
+          <label style="cursor:pointer; user-select:none; font-size:12px; color:#a6e22e;" title="When checked, downloads the original uploaded Host .skel binary renamed to match your custom base name">
+            <input type="checkbox" id="exportIncludeSkelCb" checked> <strong>Include Host .skel Binary</strong>
+          </label>
+        </div>
+      </div>
+      <button id="exportAllBtn">📦 Export 3-in-1 (.png + .atlas + .skel)</button>
+    </div>
+  </div>
+
+  <hr style="border-color:#383838;">
+
+  <div class="row">
+    <div class="mode-box" id="modeBoxContainer">
+      <div class="ctrl">
+        <label style="color:#f0c674;"><strong>🛠️ Surgical Canvas Left-Click Mode:</strong></label>
+        <select id="interactionModeSelect" style="font-weight:bold; border-color:#f0c674;">
+          <option value="paint" selected>🖌️ Paint Zone Mode (Assign Part Zones)</option>
+          <option value="putty_add">🧱 Putty Brush Mode (Add Joint Putty)</option>
+          <option value="putty_erase">🧹 Putty Eraser Mode (Erase Joint Putty)</option>
+          <option value="drag">🎯 Pivot Drag Mode (Drag Yellow Joint Pivots)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ctrl" style="flex:1;">
+      <label><strong>Zone Brushes (Select and paint on Canvas A to assign pixels to part):</strong></label>
+      <div id="brushButtonsContainer" style="display:flex; gap:8px; margin-top:4px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="ctrl">
+      <label>Brush Size (<span id="bSizeVal">24</span>px):</label>
+      <input type="range" id="brushSize" min="1" max="100" value="24">
+    </div>
+    <button id="resetZonesBtn" style="background:#555;">Reset Default Zones &amp; Pivots</button>
+  </div>
+</div>
+
+<div class="workspace">
+  <!-- Left Card A: Surgical Canvas (100% - 800%) -->
+  <div class="card">
+    <div class="card-header">
+      <h3>A. Universal Character Surgical Canvas (Wheel Zoom 100%-800% / Right-Click Pan)</h3>
+      <div class="zoom-controls">
+        <span>Zoom: <strong id="zoomValText">100%</strong></span>
+        <input type="range" id="zoomRange" min="100" max="800" step="5" value="100" style="width:95px;">
+        <button type="button" class="sub-btn" id="togglePanBtn">✋ Toggle Pan Mode</button>
+        <button type="button" class="sub-btn" id="resetViewBtn">Reset 100%</button>
+        <button type="button" class="sub-btn" id="undoBtn" disabled title="Undo Last Action (Ctrl+Z)">↩ Undo</button>
+      </div>
+    </div>
+
+    <div class="ref-bar">
+      <div class="ctrl">
+        <label><strong style="color:#00ffcc;">Host Image (.png):</strong></label>
+        <input type="file" id="refPngInput" accept=".png,image/*">
+      </div>
+      <div class="ctrl">
+        <label><strong style="color:#00ffcc;">Host Atlas (.atlas):</strong></label>
+        <input type="file" id="refAtlasInput" accept=".atlas,.txt,*/*">
+      </div>
+      <div class="ctrl">
+        <label><strong style="color:#00ffcc;">Host Skeleton (.skel):</strong></label>
+        <input type="file" id="refSkelInput" accept=".skel,*/*">
+      </div>
+      <label style="cursor:pointer; user-select:none;">
+        <input type="checkbox" id="showRefSkeletonCb" checked> <strong>Show Host Reconstruction (alpha=0.3)</strong>
+      </label>
+      <label style="cursor:pointer; user-select:none;" title="Many skill files (attack_sk*) and FX files (fx_*) hide attachments in Setup Pose; check to force display all skin attachments">
+        <input type="checkbox" id="showAllSkinAttsCb" checked> <span style="color:#ffeb3b;">Reveal Hidden/Skill Attachments</span>
+      </label>
+      <label style="cursor:pointer; user-select:none;">
+        <input type="checkbox" id="showRefBonesCb" checked> Show Bone Links
+      </label>
+    </div>
+
+    <canvas id="surgicalCanvas" width="900" height="750" style="cursor:crosshair;"></canvas>
+  </div>
+
+  <!-- Right Card B: Assembly & Host Rig Preview (100% - 800%) -->
+  <div class="card">
+    <div class="card-header">
+      <h3>B. Part Assembly &amp; Host Rig Live Preview (Wheel Zoom 100%-800% / Right-Click Pan)</h3>
+      <div class="zoom-controls">
+        <span>Zoom: <strong id="pZoomValText">100%</strong></span>
+        <input type="range" id="pZoomRange" min="100" max="800" step="5" value="100" style="width:90px;">
+        <button type="button" class="sub-btn" id="pTogglePanBtn">✋ Pan Mode</button>
+        <button type="button" class="sub-btn tex-drag-active" id="pToggleDragTexBtn">🎯 Left-Drag Texture Pos (ON)</button>
+        <button type="button" class="sub-btn" id="pResetViewBtn">Reset 100%</button>
+      </div>
+    </div>
+
+    <div class="b-tool-bar">
+      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+          <strong style="color:#4cd964;">👁️ Layer Visibility:</strong>
+          <div id="bLayerTogglesContainer" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+          <label class="layer-pill">
+            <input type="checkbox" id="bShowShadowLayerCb" checked> Shadow
+          </label>
+          <label class="layer-pill">
+            <input type="checkbox" id="bShowBonesOverlayCb" checked> <span style="color:#00ffcc;">Show Bones</span>
+          </label>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" class="sub-btn" id="bShowAllLayersBtn" style="padding:2px 8px; font-size:11px;">Show All</button>
+          <button type="button" class="sub-btn" id="bSoloCurrentLayerBtn" style="padding:2px 8px; font-size:11px;">Solo Selected Part</button>
+          <label style="cursor:pointer; user-select:none; color:#00ffcc; margin-left:4px;">
+            <input type="checkbox" id="previewHostRigCb" checked> <strong>🧬 Host .skel Live Rig Preview</strong>
+          </label>
+        </div>
+      </div>
+
+      <hr style="border:0; border-top:1px solid #2b473e; margin:2px 0;">
+
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+        <strong style="color:#ffbe76;">🔧 Part Texture Offset Tune (<span id="texTuneTargetLabel" style="color:#00e5ff;">#3 Front/Right Limb</span>):</strong>
+
+        <div style="display:flex; align-items:center; gap:4px;">
+          <span>ΔX:</span>
+          <input type="range" id="texTuneDx" min="-500" max="500" step="1" value="0" style="width:70px;">
+          <input type="number" id="texTuneDxNum" min="-1500" max="1500" value="0" style="width:50px;">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:4px;">
+          <span>ΔY:</span>
+          <input type="range" id="texTuneDy" min="-500" max="500" step="1" value="0" style="width:70px;">
+          <input type="number" id="texTuneDyNum" min="-1500" max="1500" value="0" style="width:50px;">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:4px;">
+          <span>Rot°:</span>
+          <input type="range" id="texTuneRot" min="-180" max="180" step="1" value="0" style="width:65px;">
+          <input type="number" id="texTuneRotNum" min="-180" max="180" value="0" style="width:45px;">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:4px;">
+          <span>Scale%:</span>
+          <input type="range" id="texTuneScale" min="30" max="250" step="1" value="100" style="width:65px;">
+          <input type="number" id="texTuneScaleNum" min="30" max="250" value="100" style="width:48px;">
+        </div>
+
+        <button type="button" class="sub-btn" id="snapTexToHostBoneBtn" style="background:#5a3d7a; border-color:#9b6bcc; padding:3px 8px; font-size:11px;">🔗 Snap Yellow Pivot to Host Bone</button>
+        <button type="button" class="sub-btn" id="resetTexTuneBtn" style="padding:3px 8px; font-size:11px;">↺ Reset Part Tune</button>
+      </div>
+    </div>
+
+    <canvas id="previewCanvas" width="900" height="750" style="cursor:move;"></canvas>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:12px;">
+  <h3 id="atlasPanelTitle" style="margin:0 0 8px 0; font-size:15px; color:#4cd964;">C. Final Dynamic Packed Atlas Preview (1:1 Native Lossless Spec ｜ Top-Left 1x1 Transparent Safe Island):</h3>
+  <canvas id="atlasCanvas" width="1024" height="512"></canvas>
+</div>
+
+<script>
+const surgicalCanvas = document.getElementById('surgicalCanvas');
+const sCtx = surgicalCanvas.getContext('2d');
+const previewCanvas = document.getElementById('previewCanvas');
+const pCtx = previewCanvas.getContext('2d');
+const atlasCanvas = document.getElementById('atlasCanvas');
+const aCtx = atlasCanvas.getContext('2d');
+const statusMsg = document.getElementById('statusMsg');
+const charDimBadge = document.getElementById('charDimBadge');
+const atlasPanelTitle = document.getElementById('atlasPanelTitle');
+const exportNameInput = document.getElementById('exportNameInput');
+const exportIncludeSkelCb = document.getElementById('exportIncludeSkelCb');
+const exportAllBtn = document.getElementById('exportAllBtn');
+
+let W = 900, H = 750;
+let zoneMap = new Uint8Array(W * H);
+let puttyMap = new Uint8Array(W * H);
+let masterZoneMap = new Uint8Array(W * H);
+let masterPuttyMap = new Uint8Array(W * H);
+
+const cleanCharCanvas = document.createElement('canvas');
+cleanCharCanvas.width = W; cleanCharCanvas.height = H;
+const cleanCtx = cleanCharCanvas.getContext('2d');
+
+const rawCroppedCanvas = document.createElement('canvas');
+const rawCroppedCtx = rawCroppedCanvas.getContext('2d');
+
+let charImg = null;
+let currentBrushZone = 1;
+let isPainting = false;
+let isAnimating = false;
+let animTime = 0;
+let animId = null;
+
+let rafPending = false;
+let pendingFastInteractive = true;
+function scheduleRenderAll(fastInteractive = true) {
+  if (!fastInteractive) pendingFastInteractive = false;
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => {
+    rafPending = false;
+    const isFast = pendingFastInteractive;
+    pendingFastInteractive = true;
+    renderOutputAtlas(false, isFast);
+    renderSurgicalView();
+    renderAnimatedPreview();
+  });
+}
+
+let interactionMode = 'paint';
+let draggingPivotZoneId = null;
+let hoveredPivotZoneId = null;
+const interactionModeSelect = document.getElementById('interactionModeSelect');
+const modeBoxContainer = document.getElementById('modeBoxContainer');
+const puttyPaintBtn = document.getElementById('puttyPaintBtn');
+const puttyEraseBtn = document.getElementById('puttyEraseBtn');
+
+function getCleanExportBaseName() {
+  let raw = (exportNameInput.value || '').trim();
+  raw = raw.replace(/\.(png|jpg|jpeg|atlas|skel|txt)$/i, '');
+  if (!raw) {
+    raw = refAtlasRegions
+      ? refAtlasHeader.pngName.replace(/\.(png|jpg|jpeg)$/i, '')
+      : 'character.sprite.walk';
+  }
+  return raw;
+}
+
+function updateExportButtonLabel() {
+  const baseName = getCleanExportBaseName();
+  const includeSkel = exportIncludeSkelCb.checked;
+  const skelTag = includeSkel ? (refSkelRawBuffer ? ' + .skel' : ' + .skel[Pending]') : '';
+  exportAllBtn.textContent = `📦 Export ${baseName} (.png + .atlas${skelTag})`;
+  atlasPanelTitle.textContent = `C. Final Dynamic Packed Atlas Preview (${baseName}.png ${atlasCanvas.width} × ${atlasCanvas.height} ｜ 1:1 Lossless Native Spec ｜ Built-in 1x1 Transparent Safe Anchor):`;
+}
+
+exportNameInput.oninput = () => updateExportButtonLabel();
+exportIncludeSkelCb.onchange = () => updateExportButtonLabel();
+
+const SPINE_SPACE = {
+  rootX: 485,
+  rootY: 685,
+  scale: 1.0,
+
+  toCanvas(wx, wy) {
+    return {
+      x: Math.round(this.rootX + wx * this.scale),
+      y: Math.round(this.rootY - wy * this.scale)
+    };
+  },
+
+  toSpineWorld(cx, cy) {
+    return {
+      wx: (cx - this.rootX) / this.scale,
+      wy: (this.rootY - cy) / this.scale
+    };
+  },
+
+  canvasToMaster(cx, cy) {
+    return {
+      mx: Math.round(this.rootX + (cx - this.rootX) / this.scale),
+      my: Math.round(this.rootY + (cy - this.rootY) / this.scale)
+    };
+  }
+};
+
+function updateWorkspaceDimensions(newW, newH, rootMode) {
+  const oldW = W, oldH = H;
+  const oldRootX = SPINE_SPACE.rootX;
+  const oldRootY = SPINE_SPACE.rootY;
+  const oldMasterZone = new Uint8Array(masterZoneMap);
+  const oldMasterPutty = new Uint8Array(masterPuttyMap);
+
+  W = newW;
+  H = newH;
+  if (rootMode === 'center') {
+    SPINE_SPACE.rootX = Math.round(W * 0.5);
+    SPINE_SPACE.rootY = Math.round(H * 0.55);
+  } else {
+    SPINE_SPACE.rootX = Math.round(W * 0.54);
+    SPINE_SPACE.rootY = Math.round(H - 65);
+  }
+
+  surgicalCanvas.width = W; surgicalCanvas.height = H;
+  previewCanvas.width = W; previewCanvas.height = H;
+  cleanCharCanvas.width = W; cleanCharCanvas.height = H;
+  refCacheCanvas.width = W; refCacheCanvas.height = H;
+  refCacheValid = false;
+
+  zoneMap = new Uint8Array(W * H);
+  puttyMap = new Uint8Array(W * H);
+  masterZoneMap = new Uint8Array(W * H);
+  masterPuttyMap = new Uint8Array(W * H);
+
+  for (let y = 0; y < oldH; y++) {
+    const ny = SPINE_SPACE.rootY + (y - oldRootY);
+    if (ny < 0 || ny >= H) continue;
+    for (let x = 0; x < oldW; x++) {
+      const nx = SPINE_SPACE.rootX + (x - oldRootX);
+      if (nx < 0 || nx >= W) continue;
+      const oldIdx = y * oldW + x;
+      const newIdx = ny * W + nx;
+      masterZoneMap[newIdx] = oldMasterZone[oldIdx];
+      masterPuttyMap[newIdx] = oldMasterPutty[oldIdx];
+    }
+  }
+
+  undoStack.length = 0;
+  undoBtn.disabled = true;
+  clampPanBounds();
+  clampPreviewPanBounds();
+  syncPivotsWithSpineSpace();
+
+  if (charImg && CHAR_METRICS.cropW > 0) {
+    projectCroppedCharToCanvas(false);
+    rebuildZoneCache();
+  }
+  renderAll();
+}
+
+document.getElementById('canvasSizeSelect').onchange = e => {
+  const [cw, ch] = e.target.value.split('x').map(n => parseInt(n, 10));
+  const rMode = document.getElementById('rootPresetSelect').value;
+  updateWorkspaceDimensions(cw, ch, rMode);
+  statusMsg.style.color = '#00e5ff';
+  statusMsg.textContent = `📐 Switched surgical canvas size to ${cw} × ${ch} px (1:1 Lossless Pixel Space)`;
+};
+
+document.getElementById('rootPresetSelect').onchange = e => {
+  const [cw, ch] = document.getElementById('canvasSizeSelect').value.split('x').map(n => parseInt(n, 10));
+  updateWorkspaceDimensions(cw, ch, e.target.value);
+  statusMsg.style.color = '#00e5ff';
+  statusMsg.textContent = `🎯 Switched Spine (0,0) origin point to (${SPINE_SPACE.rootX}, ${SPINE_SPACE.rootY})`;
+};
+
+const CHAR_METRICS = {
+  rawW: 0,
+  rawH: 0,
+  minX: 0,
+  minY: 0,
+  cropW: 0,
+  cropH: 0,
+  dx: 0,
+  dy: 0,
+  dw: 0,
+  dh: 0,
+  scale: 1.0
+};
+
+const ZONE_PALETTE = [
+  { colorHex: '#ff3b30', btnBg: '#8b1e1e', overlayRgba: [255, 60, 60, 105] },
+  { colorHex: '#ff9500', btnBg: '#b35900', overlayRgba: [255, 155, 0, 115] },
+  { colorHex: '#4cd964', btnBg: '#1e7e34', overlayRgba: [40, 220, 80, 115] },
+  { colorHex: '#00c7be', btnBg: '#117a8b', overlayRgba: [0, 210, 230, 115] },
+  { colorHex: '#bf5af2', btnBg: '#6b2d8f', overlayRgba: [191, 90, 242, 115] },
+  { colorHex: '#ffd60a', btnBg: '#8a7300', overlayRgba: [255, 214, 10, 115] },
+  { colorHex: '#ff2d55', btnBg: '#8f1930', overlayRgba: [255, 45, 85, 115] },
+  { colorHex: '#5e5ce6', btnBg: '#323085', overlayRgba: [94, 92, 230, 115] },
+  { colorHex: '#a6e22e', btnBg: '#557515', overlayRgba: [166, 226, 46, 115] },
+  { colorHex: '#64d2ff', btnBg: '#246985', overlayRgba: [100, 210, 255, 115] },
+  { colorHex: '#ff69b4', btnBg: '#8c3160', overlayRgba: [255, 105, 180, 115] },
+  { colorHex: '#00ff99', btnBg: '#007a49', overlayRgba: [0, 255, 153, 115] }
+];
+
+const NEW_ZONE_TEMPLATES = [
+  { name: 'Head/Helm', slotHints: ['helm', 'head', 'visor', 'neck'], wx: 10, wy: 260, role: 'head' },
+  { name: 'Right Arm', slotHints: ['right_arm', 'arm_R', 'right_gauntlet', 'upper_arm_R', 'Arms'], wx: -55, wy: 210, role: 'arm_R' },
+  { name: 'Left Arm', slotHints: ['left_arm', 'arm_L', 'left_gauntlet', 'upper_arm_L'], wx: 55, wy: 210, role: 'arm_L' },
+  { name: 'Weapon/Acc', slotHints: ['sword', 'weapon', 'shield', 'lock_square', 'chain_upper'], wx: 85, wy: 180, role: 'weapon' },
+  { name: 'Pauldron/Cape', slotHints: ['right_pauldron', 'left_pauldron', 'shoulder_L', 'cape_front', 'wing_R'], wx: -35, wy: 245, role: 'extra' },
+  { name: 'Right Boot', slotHints: ['right_boot', 'right_foot', 'leg_R2'], wx: -45, wy: 60, role: 'leg_R' },
+  { name: 'Left Boot', slotHints: ['left_boot', 'left_foot'], wx: 45, wy: 60, role: 'leg_L' }
+];
+
+let zonesList = [];
+let zoneCache = {};
+
+function createZoneObject(id, name, hostSlot, wx, wy, role) {
+  const pal = ZONE_PALETTE[(id - 1) % ZONE_PALETTE.length];
+  const cPt = SPINE_SPACE.toCanvas(wx, wy);
+  return {
+    id,
+    name,
+    colorHex: pal.colorHex,
+    btnBg: pal.btnBg,
+    overlayRgba: pal.overlayRgba,
+    hostSlot: hostSlot || '',
+    role: role || 'extra',
+    visibleInPreview: true,
+    pivot: {
+      x: cPt.x,
+      y: cPt.y,
+      wx,
+      wy,
+      boneName: name
+    },
+    putty: {
+      colored: false,
+      pixelCount: 0
+    },
+    texTune: {
+      dx: 0,
+      dy: 0,
+      rot: 0,
+      scale: 100
+    }
+  };
+}
+
+function initDefaultZones() {
+  zonesList = [
+    createZoneObject(1, 'Main Torso',      'Body',  0,   190, 'body'),
+    createZoneObject(2, 'Back/Secondary',  'Tail',  -80, 160, 'secondary'),
+    createZoneObject(3, 'Front/Right Limb','leg_R', -53, 130, 'leg_R'),
+    createZoneObject(4, 'Back/Left Limb',  'leg_L', 43,  125, 'leg_L')
+  ];
+}
+initDefaultZones();
+
+function getZoneById(id) {
+  return zonesList.find(z => z.id === id) || null;
+}
+
+function syncPivotsWithSpineSpace() {
+  zonesList.forEach(z => {
+    const pt = SPINE_SPACE.toCanvas(z.pivot.wx, z.pivot.wy);
+    z.pivot.x = pt.x;
+    z.pivot.y = pt.y;
+  });
+}
+
+function getZoneUserTexMatrix(zObj) {
+  if (!zObj || !zObj.texTune) return { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+  const { dx, dy, rot, scale } = zObj.texTune;
+  const s = (scale !== undefined ? scale : 100) / 100;
+  const rad = ((rot || 0) * Math.PI) / 180;
+  const cos = Math.cos(rad) * s;
+  const sin = Math.sin(rad) * s;
+  const px = zObj.pivot.x;
+  const py = zObj.pivot.y;
+
+  return {
+    a: cos,
+    b: sin,
+    c: -sin,
+    d: cos,
+    e: px + (dx || 0) - cos * px + sin * py,
+    f: py + (dy || 0) - sin * px - cos * py
+  };
+}
+
+function multiplyAffine(m1, m2) {
+  return {
+    a: m1.a * m2.a + m1.c * m2.b,
+    b: m1.b * m2.a + m1.d * m2.b,
+    c: m1.a * m2.c + m1.c * m2.d,
+    d: m1.b * m2.c + m1.d * m2.d,
+    e: m1.a * m2.e + m1.c * m2.f + m1.e,
+    f: m1.b * m2.e + m1.d * m2.f + m1.f
+  };
+}
+
+let refPngImg = null;
+let refAtlasRegions = null;
+let refAtlasHeader = { pngName: 'character.sprite.walk.png', width: 1024, height: 512, rawText: '' };
+let refSkelData = null;
+let refSkelRawBuffer = null;
+let refSlicedParts = {};
+let refTightSlices = {};
+
+let dynamicPackedAtlas = {
+  width: 1024,
+  height: 512,
+  regions: {}
+};
+
+const refCacheCanvas = document.createElement('canvas');
+refCacheCanvas.width = W;
+refCacheCanvas.height = H;
+const refCacheCtx = refCacheCanvas.getContext('2d');
+let refCacheValid = false;
+let refBoundsMetrics = null;
+
+function parseAtlasFileText(text) {
+  const lines = text.split(/\r?\n/);
+  const regions = {};
+  let currentName = null;
+  let pngName = 'character.sprite.walk.png';
+  let pageW = 0, pageH = 0;
+  const pageProps = ['size', 'format', 'filter', 'repeat', 'pma'];
+
+  for (let raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    const lower = line.toLowerCase();
+    if (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg')) {
+      pngName = line;
+      currentName = null;
+      continue;
+    }
+    const colonIdx = line.indexOf(':');
+    if (colonIdx === -1) {
+      currentName = line;
+      regions[currentName] = {
+        name: currentName,
+        rot: false,
+        xy: [0, 0],
+        size: [0, 0],
+        orig: [0, 0],
+        offset: [0, 0],
+        index: -1
+      };
+    } else {
+      const key = line.slice(0, colonIdx).trim();
+      const val = line.slice(colonIdx + 1).trim();
+      if (!currentName && pageProps.includes(key)) {
+        if (key === 'size') {
+          const dims = val.split(',').map(v => parseInt(v.trim(), 10) || 0);
+          pageW = dims[0] || 0;
+          pageH = dims[1] || 0);
+        }
+        continue;
+      }
+      if (currentName && regions[currentName]) {
+        if (key === 'rotate') {
+          regions[currentName].rot = (val === 'true' || val === '90');
+        } else if (key === 'xy') {
+          regions[currentName].xy = val.split(',').map(v => parseInt(v.trim(), 10) || 0);
+        } else if (key === 'size') {
+          regions[currentName].size = val.split(',').map(v => parseInt(v.trim(), 10) || 0);
+        } else if (key === 'orig') {
+          regions[currentName].orig = val.split(',').map(v => parseInt(v.trim(), 10) || 0);
+        } else if (key === 'offset') {
+          regions[currentName].offset = val.split(',').map(v => parseInt(v.trim(), 10) || 0);
+        } else if (key === 'index') {
+          regions[currentName].index = parseInt(val, 10);
+        }
+      }
+    }
+  }
+  refAtlasHeader = {
+    pngName,
+    width: pageW || (refPngImg ? refPngImg.width : 1024),
+    height: pageH || (refPngImg ? refPngImg.height : 512),
+    rawText: text
+  };
+  return regions;
+}
+
+function getHostSlotAttachmentType(regName) {
+  if (!refSkelData) return 'unknown';
+  const { slots, defaultSkin } = refSkelData;
+  for (let sIdx = 0; sIdx < slots.length; sIdx++) {
+    const slot = slots[sIdx];
+    const slotSkin = defaultSkin[sIdx];
+    if (!slotSkin) continue;
+    for (const [k, att] of Object.entries(slotSkin)) {
+      const cand = att.path || att.name || k;
+      if (cand === regName || slot.attachmentName === regName || slot.name === regName) {
+        return att.type;
+      }
+    }
+  }
+  return 'unknown';
+}
+
+function findBoneForHostSlot(regName) {
+  if (!refSkelData || !regName) return null;
+  const { bones, slots, defaultSkin } = refSkelData;
+  for (let sIdx = 0; sIdx < slots.length; sIdx++) {
+    const slot = slots[sIdx];
+    const slotSkin = defaultSkin[sIdx];
+    if (slot.name === regName || slot.attachmentName === regName) {
+      return bones[slot.boneIndex] || null;
+    }
+    if (slotSkin) {
+      for (const [k, att] of Object.entries(slotSkin)) {
+        if ((att.path || att.name || k) === regName) {
+          return bones[slot.boneIndex] || null;
+        }
+      }
+    }
+  }
+  return bones.find(b => b.name.toLowerCase() === regName.toLowerCase()) || null;
+}
+
+function autoMatchHostSlotsForZones() {
+  if (!refAtlasRegions) return;
+  const regNames = Object.keys(refAtlasRegions).filter(n => n.toLowerCase() !== 'shadow');
+  if (regNames.length === 0) return;
+
+  const usedSlots = new Set();
+  const pickBest = (candidates, fallbackIdx) => {
+    for (const c of candidates) {
+      const exact = regNames.find(r => r.toLowerCase() === c.toLowerCase() && !usedSlots.has(r));
+      if (exact) { usedSlots.add(exact); return exact; }
+    }
+    for (const c of candidates) {
+      const partial = regNames.find(r => r.toLowerCase().includes(c.toLowerCase()) && !usedSlots.has(r));
+      if (partial) { usedSlots.add(partial); return partial; }
+    }
+    const unused = regNames.find(r => !usedSlots.has(r));
+    if (unused) { usedSlots.add(unused); return unused; }
+    return regNames[Math.min(fallbackIdx, regNames.length - 1)] || '';
+  };
+
+  const roleCandidates = {
+    body:      ['Body', 'chest', 'torso', 'upper_body', 'pelvis'],
+    secondary: ['Tail', 'belt', 'crotch', 'tunic', 'cape_back', 'cape', 'skirt'],
+    leg_R:     ['leg_R', 'right_leg', 'right_boot', 'calf_r', 'thigh_r'],
+    leg_L:     ['leg_L', 'left_leg', 'left_boot', 'calf_l', 'thigh_l'],
+    head:      ['Head', 'helm', 'visor', 'neck', 'face'],
+    arm_R:     ['right_arm', 'arm_R', 'right_gauntlet', 'Arms', 'forearm_r'],
+    arm_L:     ['left_arm', 'arm_L', 'left_gauntlet', 'upper_arm_L', 'forearm_l'],
+    weapon:    ['sword', 'weapon', 'lock_square', 'chain_upper', 'blade']
+  };
+
+  zonesList.forEach((z, idx) => {
+    if (z.hostSlot && regNames.includes(z.hostSlot)) {
+      usedSlots.add(z.hostSlot);
+      return;
+    }
+    const cands = roleCandidates[z.role] || [z.name];
+    z.hostSlot = pickBest(cands, idx);
+  });
+}
+
+document.getElementById('autoGenZonesFromHostBtn').onclick = () => {
+  if (!refAtlasRegions) {
+    statusMsg.style.color = '#f0c674';
+    statusMsg.textContent = '⚠️ Please load the Host Atlas (.atlas) in Section A first!';
+    return;
+  }
+  const regNames = Object.keys(refAtlasRegions).filter(n => {
+    if (n.toLowerCase() === 'shadow') return false;
+    const inf = refAtlasRegions[n];
+    return inf && inf.size[0] > 1 && inf.size[1] > 1;
+  });
+  if (regNames.length === 0) return;
+
+  saveUndoSnapshot();
+  zonesList = [];
+  const maxZones = Math.min(24, regNames.length);
+  for (let i = 0; i < maxZones; i++) {
+    const rName = regNames[i];
+    const id = i + 1;
+    let role = 'extra';
+    const low = rName.toLowerCase();
+    if (low.includes('body') || low.includes('chest') || low.includes('torso')) role = 'body';
+    else if (low.includes('leg_r') || low.includes('right_leg')) role = 'leg_R';
+    else if (low.includes('leg_l') || low.includes('left_leg')) role = 'leg_L';
+    else if (low.includes('head') || low.includes('helm')) role = 'head';
+    else if (low.includes('arm_r') || low.includes('right_arm')) role = 'arm_R';
+    else if (low.includes('arm_l') || low.includes('left_arm')) role = 'arm_L';
+
+    const wx = (i % 2 === 0 ? -1 : 1) * (25 + (i * 12) % 80);
+    const wy = Math.max(60, 260 - i * 18);
+    const z = createZoneObject(id, rName, rName, wx, wy, role);
+    if (refSkelData) {
+      const bone = findBoneForHostSlot(rName);
+      if (bone) {
+        z.pivot.x = Math.round(SPINE_SPACE.rootX + bone.worldX);
+        z.pivot.y = Math.round(SPINE_SPACE.rootY - bone.worldY);
+        const wPt = SPINE_SPACE.toSpineWorld(z.pivot.x, z.pivot.y);
+        z.pivot.wx = wPt.wx;
+        z.pivot.wy = wPt.wy;
+        z.pivot.boneName = bone.name;
+      }
+    }
+    zonesList.push(z);
+  }
+
+  currentBrushZone = zonesList[0].id;
+  if (charImg) {
+    processCharAndAutoZone(true);
+    rebuildZoneCache();
+  }
+  renderZoneManagerUI();
+  renderBrushButtonsUI();
+  renderJointSelectUI();
+  renderBLayerTogglesUI();
+  renderAll();
+  statusMsg.style.color = '#4cd964';
+  statusMsg.textContent = `⚡ Auto-generated ${zonesList.length} zones and joint pivots from Host .atlas!`;
+};
+
+function renderZoneManagerUI() {
+  const container = document.getElementById('zoneCardsContainer');
+  container.innerHTML = '';
+
+  const regNames = refAtlasRegions
+    ? Object.keys(refAtlasRegions).filter(n => n.toLowerCase() !== 'shadow')
+    : ['Body', 'Tail', 'leg_R', 'leg_L', 'Head', 'arm_L', 'Arms', 'shoulder_L', 'upper_arm_L', 'wing_L', 'wing_R'];
+
+  zonesList.forEach(z => {
+    const card = document.createElement('div');
+    card.className = 'zone-item-card';
+
+    const dot = document.createElement('span');
+    dot.className = 'zone-color-dot';
+    dot.style.background = z.colorHex;
+    card.appendChild(dot);
+
+    const idLabel = document.createElement('strong');
+    idLabel.style.color = z.colorHex;
+    idLabel.textContent = `#${z.id}`;
+    card.appendChild(idLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = z.name;
+    nameInput.style.width = '82px';
+    nameInput.title = 'Edit part zone name';
+    nameInput.onchange = () => {
+      z.name = nameInput.value.trim() || `Zone ${z.id}`;
+      renderBrushButtonsUI();
+      renderJointSelectUI();
+      renderBLayerTogglesUI();
+      renderAll();
+    };
+    card.appendChild(nameInput);
+
+    const arrow = document.createElement('span');
+    arrow.style.color = '#aaa';
+    arrow.textContent = '➔';
+    card.appendChild(arrow);
+
+    const slotSel = document.createElement('select');
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '-- Unmapped --';
+    slotSel.appendChild(noneOpt);
+
+    regNames.forEach(rName => {
+      const opt = document.createElement('option');
+      opt.value = rName;
+      if (refAtlasRegions && refAtlasRegions[rName]) {
+        const info = refAtlasRegions[rName];
+        const attType = getHostSlotAttachmentType(rName);
+        const typeTag = (attType === 'region') ? '[Region]' : ((attType === 'mesh' || attType === 'skinnedmesh') ? '[Mesh]' : '');
+        opt.textContent = `${rName} ${typeTag} (${info.orig[0]}x${info.orig[1]})`;
+      } else {
+        opt.textContent = rName;
+      }
+      if (rName === z.hostSlot) opt.selected = true;
+      slotSel.appendChild(opt);
+    });
+
+    slotSel.onchange = () => {
+      z.hostSlot = slotSel.value;
+      if (refSkelData && z.hostSlot) {
+        const bone = findBoneForHostSlot(z.hostSlot);
+        if (bone) {
+          z.pivot.x = Math.round(SPINE_SPACE.rootX + bone.worldX);
+          z.pivot.y = Math.round(SPINE_SPACE.rootY - bone.worldY);
+          const wPt = SPINE_SPACE.toSpineWorld(z.pivot.x, z.pivot.y);
+          z.pivot.wx = wPt.wx;
+          z.pivot.wy = wPt.wy;
+          z.pivot.boneName = bone.name;
+        }
+      }
+      renderJointSelectUI();
+      renderBLayerTogglesUI();
+      renderAll();
+    };
+    card.appendChild(slotSel);
+
+    if (zonesList.length > 1) {
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'del-zone-btn';
+      delBtn.textContent = '✕';
+      delBtn.title = `Delete this zone (#${z.id} ${z.name})`;
+      delBtn.onclick = () => removeZoneById(z.id);
+      card.appendChild(delBtn);
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function renderBrushButtonsUI() {
+  const container = document.getElementById('brushButtonsContainer');
+  container.innerHTML = '';
+
+  zonesList.forEach(z => {
+    const isZoneBrushActive = (interactionMode === 'paint' && currentBrushZone === z.id);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'brush-btn' + (isZoneBrushActive ? ' active' : '');
+    btn.style.background = z.btnBg;
+    btn.style.borderColor = isZoneBrushActive ? '#fff' : z.colorHex;
+    btn.textContent = `Paint: #${z.id} ${z.name}`;
+    btn.onclick = () => {
+      currentBrushZone = z.id;
+      document.getElementById('jointSelect').value = String(z.id);
+      syncTexTuneUIFromSelectedZone();
+      setInteractionMode('paint');
+      renderBrushButtonsUI();
+    };
+    container.appendChild(btn);
+  });
+
+  const isEraserActive = (interactionMode === 'paint' && currentBrushZone === 0);
+  const eraserBtn = document.createElement('button');
+  eraserBtn.type = 'button';
+  eraserBtn.className = 'brush-btn' + (isEraserActive ? ' active' : '');
+  eraserBtn.style.background = '#444';
+  eraserBtn.textContent = '🧹 Zone Eraser (Unassign Pixels)';
+  eraserBtn.onclick = () => {
+    currentBrushZone = 0;
+    setInteractionMode('paint');
+    renderBrushButtonsUI();
+  };
+  container.appendChild(eraserBtn);
+}
+
+function renderBLayerTogglesUI() {
+  const container = document.getElementById('bLayerTogglesContainer');
+  container.innerHTML = '';
+
+  zonesList.forEach(z => {
+    const lbl = document.createElement('label');
+    lbl.className = 'layer-pill' + (z.visibleInPreview ? '' : ' off');
+    lbl.style.borderColor = z.visibleInPreview ? z.colorHex : '#333';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = z.visibleInPreview;
+    cb.onchange = () => {
+      z.visibleInPreview = cb.checked;
+      lbl.className = 'layer-pill' + (z.visibleInPreview ? '' : ' off');
+      lbl.style.borderColor = z.visibleInPreview ? z.colorHex : '#333';
+      renderAnimatedPreview();
+    };
+
+    const dot = document.createElement('span');
+    dot.className = 'zone-color-dot';
+    dot.style.width = '9px';
+    dot.style.height = '9px';
+    dot.style.background = z.colorHex;
+
+    const txt = document.createElement('span');
+    txt.textContent = `#${z.id} ${z.name}`;
+
+    lbl.appendChild(cb);
+    lbl.appendChild(dot);
+    lbl.appendChild(txt);
+    container.appendChild(lbl);
+  });
+}
+
+function renderJointSelectUI() {
+  const jointSelect = document.getElementById('jointSelect');
+  const prevVal = parseInt(jointSelect.value, 10);
+  jointSelect.innerHTML = '';
+
+  zonesList.forEach(z => {
+    const opt = document.createElement('option');
+    opt.value = String(z.id);
+    opt.textContent = `#${z.id} ${z.name} (${z.hostSlot || 'Unmapped'})`;
+    jointSelect.appendChild(opt);
+  });
+
+  const targetZ = getZoneById(prevVal) || getZoneById(3) || zonesList[0];
+  if (targetZ) {
+    jointSelect.value = String(targetZ.id);
+  }
+  syncTexTuneUIFromSelectedZone();
+  updateJointSummaryUI();
+}
+
+function syncTexTuneUIFromSelectedZone() {
+  const zId = parseInt(document.getElementById('jointSelect').value, 10);
+  const zObj = getZoneById(zId) || zonesList[0];
+  if (!zObj) return;
+  if (!zObj.texTune) zObj.texTune = { dx: 0, dy: 0, rot: 0, scale: 100 };
+
+  document.getElementById('texTuneTargetLabel').textContent = `#${zObj.id} ${zObj.name}`;
+  document.getElementById('texTuneTargetLabel').style.color = zObj.colorHex;
+
+  document.getElementById('texTuneDx').value = zObj.texTune.dx;
+  document.getElementById('texTuneDxNum').value = zObj.texTune.dx;
+  document.getElementById('texTuneDy').value = zObj.texTune.dy;
+  document.getElementById('texTuneDyNum').value = zObj.texTune.dy;
+  document.getElementById('texTuneRot').value = zObj.texTune.rot;
+  document.getElementById('texTuneRotNum').value = zObj.texTune.rot;
+  document.getElementById('texTuneScale').value = zObj.texTune.scale;
+  document.getElementById('texTuneScaleNum').value = zObj.texTune.scale;
+}
+
+function addNewDynamicZone() {
+  if (zonesList.length >= 24) {
+    statusMsg.style.color = '#ff4d4d';
+    statusMsg.textContent = '⚠️ Maximum number of zones reached (24)!';
+    return;
+  }
+  saveUndoSnapshot();
+
+  let newId = 1;
+  while (getZoneById(newId)) newId++;
+
+  const tplIdx = Math.max(0, newId - 5) % NEW_ZONE_TEMPLATES.length;
+  const tpl = NEW_ZONE_TEMPLATES[tplIdx];
+
+  let chosenSlot = '';
+  if (refAtlasRegions) {
+    const regNames = Object.keys(refAtlasRegions).filter(n => n.toLowerCase() !== 'shadow');
+    const usedSlots = new Set(zonesList.map(z => z.hostSlot).filter(Boolean));
+    for (const hint of tpl.slotHints) {
+      const found = regNames.find(r => r.toLowerCase().includes(hint.toLowerCase()) && !usedSlots.has(r));
+      if (found) { chosenSlot = found; break; }
+    }
+    if (!chosenSlot) {
+      chosenSlot = regNames.find(r => !usedSlots.has(r)) || '';
+    }
+  } else {
+    chosenSlot = tpl.slotHints[0] || '';
+  }
+
+  const newZone = createZoneObject(newId, tpl.name, chosenSlot, tpl.wx, tpl.wy, tpl.role);
+
+  if (refSkelData && chosenSlot) {
+    const bone = findBoneForHostSlot(chosenSlot);
+    if (bone) {
+      newZone.pivot.x = Math.round(SPINE_SPACE.rootX + bone.worldX);
+      newZone.pivot.y = Math.round(SPINE_SPACE.rootY - bone.worldY);
+      const wPt = SPINE_SPACE.toSpineWorld(newZone.pivot.x, newZone.pivot.y);
+      newZone.pivot.wx = wPt.wx;
+      newZone.pivot.wy = wPt.wy;
+      newZone.pivot.boneName = bone.name;
+    }
+  }
+
+  zonesList.push(newZone);
+  currentBrushZone = newZone.id;
+
+  renderZoneManagerUI();
+  renderBrushButtonsUI();
+  renderJointSelectUI();
+  renderBLayerTogglesUI();
+  document.getElementById('jointSelect').value = String(newZone.id);
+  syncTexTuneUIFromSelectedZone();
+  rebuildZoneCache(newZone.id);
+  renderAll();
+
+  statusMsg.style.color = '#4cd964';
+  statusMsg.textContent = `➕ Added zone & joint [#${newZone.id} ${newZone.name}] (Mapped Host Slot: ${newZone.hostSlot || 'None'})`;
+}
+
+function removeZoneById(targetId) {
+  if (zonesList.length <= 1) return;
+  saveUndoSnapshot();
+
+  const idx = zonesList.findIndex(z => z.id === targetId);
+  if (idx === -1) return;
+  const removed = zonesList[idx];
+  zonesList.splice(idx, 1);
+
+  const fallbackId = zonesList[0].id;
+  for (let i = 0; i < W * H; i++) {
+    if (zoneMap[i] === targetId) zoneMap[i] = fallbackId;
+    if (masterZoneMap[i] === targetId) masterZoneMap[i] = fallbackId;
+    if (puttyMap[i] === targetId) puttyMap[i] = 0;
+    if (masterPuttyMap[i] === targetId) masterPuttyMap[i] = 0;
+  }
+  delete zoneCache[targetId];
+
+  if (currentBrushZone === targetId) currentBrushZone = fallbackId;
+
+  renderZoneManagerUI();
+  renderBrushButtonsUI();
+  renderJointSelectUI();
+  renderBLayerTogglesUI();
+  rebuildZoneCache();
+  renderAll();
+
+  statusMsg.style.color = '#f0c674';
+  statusMsg.textContent = `🗑️ Deleted zone [#${removed.id} ${removed.name}]; pixels merged into [#${fallbackId} ${zonesList[0].name}]`;
+}
+
+document.getElementById('addZoneBtn').onclick = addNewDynamicZone;
+
+function snapPivotsToMasterHostBones() {
+  if (!refSkelData || !refSkelData.bones) return;
+  const bones = refSkelData.bones;
+
+  const findBoneByHints = candidates => {
+    for (const c of candidates) {
+      const b = bones.find(item => item.name.toLowerCase() === c.toLowerCase());
+      if (b) return b;
+    }
+    for (const c of candidates) {
+      const b = bones.find(item => item.name.toLowerCase().includes(c.toLowerCase()));
+      if (b) return b;
+    }
+    return null;
+  };
+
+  const roleBoneHints = {
+    body:      ['chest', 'hips', 'torso', 'upper_body', 'spine_lower'],
+    secondary: ['tail_1', 'crotch', 'tunic01', 'cape_back09', 'belt'],
+    leg_R:     ['upper_leg_R', 'right_leg', 'right_upper_leg'],
+    leg_L:     ['upper_leg_L', 'left_leg', 'left_upper_leg'],
+    head:      ['head', 'helm', 'neck'],
+    arm_R:     ['right_arm', 'arm_R_1', 'right_shoulder'],
+    arm_L:     ['left_arm', 'arm_L_1', 'left_shoulder'],
+    weapon:    ['sword', 'weapon', 'hand_R_1', 'right_hand']
+  };
+
+  zonesList.forEach(z => {
+    let bone = z.hostSlot ? findBoneForHostSlot(z.hostSlot) : null;
+    if (!bone) {
+      const hints = roleBoneHints[z.role] || [z.name];
+      bone = findBoneByHints(hints);
+    }
+    if (!bone) return;
+
+    const cx = Math.round(SPINE_SPACE.rootX + bone.worldX);
+    const cy = Math.round(SPINE_SPACE.rootY - bone.worldY);
+    z.pivot.x = cx;
+    z.pivot.y = cy;
+    const wPt = SPINE_SPACE.toSpineWorld(cx, cy);
+    z.pivot.wx = wPt.wx;
+    z.pivot.wy = wPt.wy;
+    z.pivot.boneName = bone.name;
+  });
+}
+
+document.getElementById('snapPivotsToHostBtn').onclick = () => {
+  if (!refSkelData) {
+    statusMsg.style.color = '#f0c674';
+    statusMsg.textContent = '⚠️ Please upload the Host Skeleton (.skel) first to snap pivots to host bones!';
+    return;
+  }
+  saveUndoSnapshot();
+  snapPivotsToMasterHostBones();
+  if (charImg) rebuildZoneCache();
+  renderAll();
+  statusMsg.style.color = '#00ffcc';
+  statusMsg.textContent = `🧲 Snapped all ${zonesList.length} yellow joint pivots to exact Host .skel bone coordinates!`;
+};
+
+document.getElementById('unmappedSlotPolicySelect').onchange = () => renderAll();
+document.getElementById('unclippedBakeCb').onchange = () => renderAll();
+document.getElementById('showHostUvBoundsCb').onchange = () => renderSurgicalView();
+document.getElementById('previewHostRigCb').onchange = () => renderAnimatedPreview();
+document.getElementById('showAllSkinAttsCb').onchange = () => {
+  refCacheValid = false;
+  renderSurgicalView();
+  renderAnimatedPreview();
+};
+
+function rebuildRefSlicedParts() {
+  refSlicedParts = {};
+  refTightSlices = {};
+  refCacheValid = false;
+  if (!refPngImg || !refAtlasRegions) return;
+
+  for (const [name, info] of Object.entries(refAtlasRegions)) {
+    const [rx, ry] = info.xy;
+    const [rw, rh] = info.size;
+    const [origW, origH] = info.orig;
+    const [offX, offY] = info.offset;
+
+    if (rw <= 0 || rh <= 0) continue;
+
+    const fullW = (origW > 0) ? origW : rw;
+    const fullH = (origH > 0) ? origH : rh;
+
+    const origCanvas = document.createElement('canvas');
+    origCanvas.width = fullW;
+    origCanvas.height = fullH;
+    const oCtx = origCanvas.getContext('2d');
+
+    const cutCanvas = document.createElement('canvas');
+    cutCanvas.width = rw;
+    cutCanvas.height = rh;
+    const cCtx = cutCanvas.getContext('2d');
+
+    if (info.rot) {
+      cCtx.translate(rw, 0);
+      cCtx.rotate(Math.PI / 2);
+      cCtx.drawImage(refPngImg, rx, ry, rh, rw, 0, 0, rh, rw);
+    } else {
+      cCtx.drawImage(refPngImg, rx, ry, rw, rh, 0, 0, rw, rh);
+    }
+
+    const pasteX = offX;
+    const pasteY = fullH - rh - offY;
+    oCtx.drawImage(cutCanvas, pasteX, pasteY);
+
+    refSlicedParts[name] = origCanvas;
+    refTightSlices[name] = {
+      tightCanvas: cutCanvas,
+      origCanvas: origCanvas,
+      size: [rw, rh],
+      orig: [fullW, fullH],
+      offset: [offX, offY],
+      index: info.index !== undefined ? info.index : -1
+    };
+  }
+}
+
+function parseSkelBinary(arrayBuffer) {
+  const view = new DataView(arrayBuffer);
+  let offset = 0;
+
+  function readByte() { return view.getUint8(offset++); }
+  function readSByte() { return view.getInt8(offset++); }
+  function readBoolean() { return view.getUint8(offset++) !== 0; }
+  function readInt32() { const val = view.getInt32(offset, false); offset += 4; return val; }
+  function readShort() { const val = view.getInt16(offset, false); offset += 2; return val; }
+  function readFloat() { const val = view.getFloat32(offset, false); offset += 4; return val; }
+  function readInt(optimizePositive) {
+    let b = view.getUint8(offset++);
+    let result = b & 0x7F;
+    if ((b & 0x80) !== 0) {
+      b = view.getUint8(offset++);
+      result |= (b & 0x7F) << 7;
+      if ((b & 0x80) !== 0) {
+        b = view.getUint8(offset++);
+        result |= (b & 0x7F) << 14;
+        if ((b & 0x80) !== 0) {
+          b = view.getUint8(offset++);
+          result |= (b & 0x7F) << 21;
+          if ((b & 0x80) !== 0) {
+            b = view.getUint8(offset++);
+            result |= (b & 0x7F) << 28;
+          }
+        }
+      }
+    }
+    return optimizePositive ? result : ((result >>> 1) ^ -(result & 1));
+  }
+  function readString() {
+    let charCount = readInt(true);
+    if (charCount === 0) return null;
+    if (charCount === 1) return "";
+    charCount--;
+    let str = "";
+    for (let i = 0; i < charCount; i++) {
+      const b = view.getUint8(offset++);
+      if (b > 127) {
+        if ((b >> 4) === 12 || (b >> 4) === 13) {
+          const b2 = view.getUint8(offset++);
+          str += String.fromCharCode(((b & 0x1F) << 6) | (b2 & 0x3F));
+        } else if ((b >> 4) === 14) {
+          const b2 = view.getUint8(offset++);
+          const b3 = view.getUint8(offset++);
+          str += String.fromCharCode(((b & 0x0F) << 12) | ((b2 & 0x3F) << 6) | (b3 & 0x3F));
+        }
+      } else {
+        str += String.fromCharCode(b);
+      }
+    }
+    return str;
+  }
+  function readFloatArray(n) { const arr = new Float32Array(n); for (let i = 0; i < n; i++) arr[i] = readFloat(); return arr; }
+  function readShortArray(n) { const arr = new Int16Array(n); for (let i = 0; i < n; i++) arr[i] = readShort(); return arr; }
+  function readIntArray(n) { const arr = new Int32Array(n); for (let i = 0; i < n; i++) arr[i] = readInt(true); return arr; }
+
+  const hash = readString();
+  const version = readString();
+  const width = readFloat();
+  const height = readFloat();
+  const nonessential = readBoolean();
+  if (nonessential) readString();
+
+  const boneCount = readInt(true);
+  const bones = [];
+  for (let i = 0; i < boneCount; i++) {
+    const name = readString();
+    const parent = readInt(true) - 1;
+    const x = readFloat();
+    const y = readFloat();
+    const scaleX = readFloat();
+    const scaleY = readFloat();
+    const rotation = readFloat();
+    const length = readFloat();
+    const flipX = readBoolean();
+    const flipY = readBoolean();
+    const inheritScale = readBoolean();
+    const inheritRotation = readBoolean();
+    if (nonessential) readInt32();
+
+    bones.push({
+      index: i, name, parent,
+      x, y, scaleX, scaleY, rotation, length,
+      flipX, flipY, inheritScale, inheritRotation,
+      worldX: 0, worldY: 0,
+      m00: 1, m01: 0, m10: 0, m11: 1,
+      worldScaleX: 1, worldScaleY: 1, worldRotation: 0,
+      _computed: false
+    });
+  }
+
+  function computeBoneWorld(idx) {
+    const b = bones[idx];
+    if (!b || b._computed) return;
+    if (b.parent < 0 || b.parent >= boneCount || b.parent === idx) {
+      b.worldX = b.x;
+      b.worldY = b.y;
+      b.worldScaleX = b.scaleX;
+      b.worldScaleY = b.scaleY;
+      b.worldRotation = b.rotation;
+    } else {
+      computeBoneWorld(b.parent);
+      const p = bones[b.parent];
+      b.worldX = p.m00 * b.x + p.m01 * b.y + p.worldX;
+      b.worldY = p.m10 * b.x + p.m11 * b.y + p.worldY;
+      b.worldScaleX = b.inheritScale ? p.worldScaleX * b.scaleX : b.scaleX;
+      b.worldScaleY = b.inheritScale ? p.worldScaleY * b.scaleY : b.scaleY;
+      b.worldRotation = b.inheritRotation ? p.worldRotation + b.rotation : b.rotation;
+    }
+    const rad = b.worldRotation * Math.PI / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    b.m00 = cos * b.worldScaleX;
+    b.m01 = -sin * b.worldScaleY;
+    b.m10 = sin * b.worldScaleX;
+    b.m11 = cos * b.worldScaleY;
+    if (b.flipX) { b.m00 = -b.m00; b.m01 = -b.m01; }
+    if (b.flipY) { b.m10 = -b.m10; b.m11 = -b.m11; }
+    b._computed = true;
+  }
+  for (let i = 0; i < boneCount; i++) computeBoneWorld(i);
+
+  const ikCount = readInt(true);
+  for (let i = 0; i < ikCount; i++) {
+    readString();
+    const bCount = readInt(true);
+    for (let j = 0; j < bCount; j++) readInt(true);
+    readInt(true);
+    readFloat();
+    readSByte();
+  }
+
+  const slotCount = readInt(true);
+  const slots = [];
+  for (let i = 0; i < slotCount; i++) {
+    const name = readString();
+    const boneIndex = readInt(true);
+    const color = readInt32();
+    const attachmentName = readString();
+    const additive = readBoolean();
+    slots.push({ index: i, name, boneIndex, color, attachmentName, additive });
+  }
+
+  function readAttachment(placeholderName) {
+    let name = readString();
+    if (!name) name = placeholderName;
+    const type = readByte();
+
+    if (type === 0) {
+      let path = readString();
+      if (!path) path = name;
+      const x = readFloat();
+      const y = readFloat();
+      const scaleX = readFloat();
+      const scaleY = readFloat();
+      const rotation = readFloat();
+      const width = readFloat();
+      const height = readFloat();
+      const color = readInt32();
+      return { type: 'region', name, path, x, y, scaleX, scaleY, rotation, width, height, color };
+    } else if (type === 1) {
+      const vCount = readInt(true);
+      const vertices = readFloatArray(vCount);
+      return { type: 'boundingbox', name, vertices };
+    } else if (type === 2) {
+      let path = readString();
+      if (!path) path = name;
+      const uvCount = readInt(true);
+      const uvs = readFloatArray(uvCount);
+      const triCount = readInt(true);
+      const triangles = readShortArray(triCount);
+      const vertCount = readInt(true);
+      const vertices = readFloatArray(vertCount);
+      const color = readInt32();
+      const hullLength = readInt(true);
+      if (nonessential) {
+        const edgeCount = readInt(true);
+        readIntArray(edgeCount);
+        readFloat();
+        readFloat();
+      }
+      return { type: 'mesh', name, path, uvs, triangles, vertices, color, hullLength };
+    } else if (type === 3) {
+      let path = readString();
+      if (!path) path = name;
+      const uvCount = readInt(true);
+      const uvs = readFloatArray(uvCount);
+      const triCount = readInt(true);
+      const triangles = readShortArray(triCount);
+      const vertexDataCount = readInt(true);
+      const vCount = uvCount >> 1;
+      const weights = [];
+      for (let v = 0; v < vCount; v++) {
+        const bCount = Math.round(readFloat());
+        const influences = [];
+        for (let b = 0; b < bCount; b++) {
+          const boneIndex = Math.round(readFloat());
+          const vx = readFloat();
+          const vy = readFloat();
+          const weight = readFloat();
+          influences.push({ boneIndex, vx, vy, weight });
+        }
+        weights.push(influences);
+      }
+      const color = readInt32();
+      const hullLength = readInt(true);
+      if (nonessential) {
+        const edgeCount = readInt(true);
+        readIntArray(edgeCount);
+        readFloat();
+        readFloat();
+      }
+      return { type: 'skinnedmesh', name, path, uvs, triangles, weights, color, hullLength };
+    }
+    return null;
+  }
+
+  const defaultSkin = {};
+  const skinSlotCount = readInt(true);
+  for (let i = 0; i < skinSlotCount; i++) {
+    const slotIndex = readInt(true);
+    defaultSkin[slotIndex] = {};
+    const attCount = readInt(true);
+    for (let j = 0; j < attCount; j++) {
+      const placeholderName = readString();
+      const att = readAttachment(placeholderName);
+      if (att) defaultSkin[slotIndex][placeholderName] = att;
+    }
+  }
+
+  return { version, width, height, bones, slots, defaultSkin };
+}
+
+function solveMeshAffineMatrix(uvs, worldPts, imgW, imgH) {
+  const n = worldPts.length;
+  if (n < 3) return null;
+
+  let sXX = 0, sXY = 0, sX = 0;
+  let sYY = 0, sY = 0, s1 = n;
+  let bX_x = 0, bX_y = 0, bX_1 = 0;
+  let bY_x = 0, bY_y = 0, bY_1 = 0;
+
+  for (let i = 0; i < n; i++) {
+    const px = uvs[i * 2] * imgW;
+    const py = uvs[i * 2 + 1] * imgH;
+    const wx = worldPts[i].x;
+    const wy = worldPts[i].y;
+
+    sXX += px * px;
+    sXY += px * py;
+    sX  += px;
+    sYY += py * py;
+    sY  += py;
+
+    bX_x += px * wx;
+    bX_y += py * wx;
+    bX_1 += wx;
+
+    bY_x += px * wy;
+    bY_y += py * wy;
+    bY_1 += wy;
+  }
+
+  const m00 = sXX, m01 = sXY, m02 = sX;
+  const m10 = sXY, m11 = sYY, m12 = sY;
+  const m20 = sX,  m21 = sY,  m22 = s1;
+
+  const det = m00 * (m11 * m22 - m12 * m21)
+            - m01 * (m10 * m22 - m12 * m20)
+            + m02 * (m10 * m21 - m11 * m20);
+  if (Math.abs(det) < 1e-6) return null;
+
+  const inv00 =  (m11 * m22 - m12 * m21) / det;
+  const inv01 = -(m01 * m22 - m02 * m21) / det;
+  const inv02 =  (m01 * m12 - m02 * m11) / det;
+  const inv10 = -(m10 * m22 - m12 * m20) / det;
+  const inv11 =  (m00 * m22 - m02 * m20) / det;
+  const inv12 = -(m00 * m12 - m02 * m10) / det;
+  const inv20 =  (m10 * m21 - m11 * m20) / det;
+  const inv21 = -(m00 * m21 - m01 * m20) / det;
+  const inv22 =  (m00 * m11 - m01 * m10) / det;
+
+  const a = inv00 * bX_x + inv01 * bX_y + inv02 * bX_1;
+  const c = inv10 * bX_x + inv11 * bX_y + inv12 * bX_1;
+  const e = inv20 * bX_x + inv21 * bX_y + inv22 * bX_1;
+
+  const b = inv00 * bY_x + inv01 * bY_y + inv02 * bY_1;
+  const d = inv10 * bY_x + inv11 * bY_y + inv12 * bY_1;
+  const f = inv20 * bY_x + inv21 * bY_y + inv22 * bY_1;
+
+  return { a, b, c, d, e, f };
+}
+
+function invertAffineMatrix(m) {
+  if (!m) return null;
+  const det = m.a * m.d - m.b * m.c;
+  if (Math.abs(det) < 1e-8) return null;
+  const ia =  m.d / det;
+  const ib = -m.b / det;
+  const ic = -m.c / det;
+  const id =  m.a / det;
+  const ie = -(ia * m.e + ic * m.f);
+  const if_ = -(ib * m.e + id * m.f);
+  return { a: ia, b: ib, c: ic, d: id, e: ie, f: if_ };
+}
+
+function getHostRegionTransformInfo(regName) {
+  if (!refSkelData || !refAtlasRegions || !refAtlasRegions[regName]) return null;
+  const info = refAtlasRegions[regName];
+  const origW = info.orig[0] > 0 ? info.orig[0] : info.size[0];
+  const origH = info.orig[1] > 0 ? info.orig[1] : info.size[1];
+
+  const { bones, slots, defaultSkin } = refSkelData;
+  const toCanvasPt = (wx, wy) => ({
+    x: SPINE_SPACE.rootX + wx,
+    y: SPINE_SPACE.rootY - wy
+  });
+
+  for (let sIdx = 0; sIdx < slots.length; sIdx++) {
+    const slot = slots[sIdx];
+    const slotSkin = defaultSkin[sIdx];
+    if (!slotSkin) continue;
+
+    let att = slot.attachmentName ? slotSkin[slot.attachmentName] : null;
+    if (!att || ((att.path || att.name || slot.attachmentName) !== regName && slot.name !== regName)) {
+      att = slotSkin[regName] || Object.values(slotSkin).find(a => (a.path || a.name) === regName);
+    }
+    if (!att) continue;
+
+    const bone = bones[slot.boneIndex];
+    if (!bone) continue;
+
+    if (att.type === 'region') {
+      const rad = att.rotation * Math.PI / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      const la = cos * att.scaleX;
+      const lb = -sin * att.scaleY;
+      const lc = sin * att.scaleX;
+      const ld = cos * att.scaleY;
+
+      const hw = att.width / 2;
+      const hh = att.height / 2;
+
+      const localToCanvas = (ax, ay) => {
+        const bx = la * ax + lb * ay + att.x;
+        const by = lc * ax + ld * ay + att.y;
+        const wx = bone.m00 * bx + bone.m01 * by + bone.worldX;
+        const wy = bone.m10 * bx + bone.m11 * by + bone.worldY;
+        return toCanvasPt(wx, wy);
+      };
+
+      const p0 = localToCanvas(-hw,  hh);
+      const p1 = localToCanvas( hw,  hh);
+      const p2 = localToCanvas(-hw, -hh);
+
+      const fwd = {
+        a: (p1.x - p0.x) / origW,
+        b: (p1.y - p0.y) / origW,
+        c: (p2.x - p0.x) / origH,
+        d: (p2.y - p0.y) / origH,
+        e: p0.x,
+        f: p0.y
+      };
+      return { fwd, inv: invertAffineMatrix(fwd), origW, origH, att, bone, localToCanvas };
+    } else if (att.type === 'mesh' || att.type === 'skinnedmesh') {
+      const worldPts = [];
+      if (att.type === 'mesh') {
+        const vCount = att.vertices.length >> 1;
+        for (let v = 0; v < vCount; v++) {
+          const lx = att.vertices[v * 2];
+          const ly = att.vertices[v * 2 + 1];
+          const wx = bone.m00 * lx + bone.m01 * ly + bone.worldX;
+          const wy = bone.m10 * lx + bone.m11 * ly + bone.worldY;
+          worldPts.push(toCanvasPt(wx, wy));
+        }
+      } else {
+        const vCount = att.weights.length;
+        for (let v = 0; v < vCount; v++) {
+          const influences = att.weights[v];
+          let wx = 0, wy = 0;
+          for (let k = 0; k < influences.length; k++) {
+            const inf = influences[k];
+            const b = bones[inf.boneIndex];
+            if (!b) continue;
+            wx += (b.m00 * inf.vx + b.m01 * inf.vy + b.worldX) * inf.weight;
+            wy += (b.m10 * inf.vx + b.m11 * inf.vy + b.worldY) * inf.weight;
+          }
+          worldPts.push(toCanvasPt(wx, wy));
+        }
+      }
+      const fwd = solveMeshAffineMatrix(att.uvs, worldPts, origW, origH);
+      return { fwd, inv: invertAffineMatrix(fwd), origW, origH, att, bone, worldPts };
+    }
+  }
+  return null;
+}
+
+function drawTexturedTriangle(ctx, img, u0, v0, u1, v1, u2, v2, x0, y0, x1, y1, x2, y2) {
+  const du1 = u1 - u0, dv1 = v1 - v0;
+  const du2 = u2 - u0, dv2 = v2 - v0;
+  const det = du1 * dv2 - du2 * dv1;
+  if (Math.abs(det) < 1e-6) return;
+
+  const dx1 = x1 - x0, dy1 = y1 - y0;
+  const dx2 = x2 - x0, dy2 = y2 - y0;
+
+  const a = (dx1 * dv2 - dx2 * dv1) / det;
+  const c = (du1 * dx2 - du2 * dx1) / det;
+  const e = x0 - a * u0 - c * v0;
+
+  const b = (dy1 * dv2 - dy2 * dv1) / det;
+  const d = (du1 * dy2 - du2 * dy1) / det;
+  const f = y0 - b * u0 - d * v0;
+
+  const cx = (x0 + x1 + x2) / 3;
+  const cy = (y0 + y1 + y2) / 3;
+  const expand = (px, py) => {
+    const vx = px - cx, vy = py - cy;
+    const len = Math.hypot(vx, vy) || 1;
+    return [px + (vx / len) * 0.4, py + (vy / len) * 0.4];
+  };
+  const [ex0, ey0] = expand(x0, y0);
+  const [ex1, ey1] = expand(x1, y1);
+  const [ex2, ey2] = expand(x2, y2);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(ex0, ey0);
+  ctx.lineTo(ex1, ey1);
+  ctx.lineTo(ex2, ey2);
+  ctx.closePath();
+  ctx.clip();
+  ctx.transform(a, b, c, d, e, f);
+  ctx.drawImage(img, 0, 0);
+  ctx.restore();
+}
+
+function renderSkelWithPartsMap(targetCtx, partsDict, useDynamicPackedRegions = false, respectLayerVisibility = false) {
+  if (!refSkelData) return;
+  const { bones, slots, defaultSkin } = refSkelData;
+  const baseRootX = SPINE_SPACE.rootX;
+  const baseRootY = SPINE_SPACE.rootY;
+  const showShadow = document.getElementById('bShowShadowLayerCb').checked;
+  const showAllSkinAtts = document.getElementById('showAllSkinAttsCb').checked;
+
+  const toCanvasPt = (wx, wy) => ({
+    x: baseRootX + wx,
+    y: baseRootY - wy
+  });
+
+  for (let sIdx = 0; sIdx < slots.length; sIdx++) {
+    const slot = slots[sIdx];
+    const slotSkin = defaultSkin[sIdx];
+    if (!slotSkin) continue;
+
+    const attList = [];
+    if (slot.attachmentName && slotSkin[slot.attachmentName]) {
+      attList.push(slotSkin[slot.attachmentName]);
+    } else if (showAllSkinAtts || useDynamicPackedRegions) {
+      for (const candAtt of Object.values(slotSkin)) {
+        attList.push(candAtt);
+        if (!showAllSkinAtts) break;
+      }
+    }
+    if (attList.length === 0) continue;
+
+    const bone = bones[slot.boneIndex];
+    if (!bone) continue;
+
+    for (const att of attList) {
+      const regName = att.path || att.name || slot.attachmentName;
+
+      if (useDynamicPackedRegions) {
+        const dynReg = dynamicPackedAtlas.regions[regName] || dynamicPackedAtlas.regions[att.name] || dynamicPackedAtlas.regions[slot.attachmentName];
+        if (!dynReg || !dynReg.used || !dynReg.canvas) continue;
+
+        if (respectLayerVisibility) {
+          if (dynReg.name.toLowerCase() === 'shadow' && !showShadow) continue;
+          if (dynReg.zones && dynReg.zones.length > 0 && dynReg.zones[0] !== 'shadow') {
+            const anyVisible = dynReg.zones.some(zId => {
+              const zObj = getZoneById(zId);
+              return zObj && zObj.visibleInPreview;
+            });
+            if (!anyVisible) continue;
+          }
+        }
+
+        if (att.type === 'region') {
+          const rad = att.rotation * Math.PI / 180;
+          const cos = Math.cos(rad);
+          const sin = Math.sin(rad);
+          const la = cos * att.scaleX;
+          const lb = -sin * att.scaleY;
+          const lc = sin * att.scaleX;
+          const ld = cos * att.scaleY;
+
+          const origW = dynReg.orig[0] > 0 ? dynReg.orig[0] : att.width;
+          const origH = dynReg.orig[1] > 0 ? dynReg.orig[1] : att.height;
+          const sizeW = dynReg.size[0];
+          const sizeH = dynReg.size[1];
+          const offX = dynReg.offset[0];
+          const offY = dynReg.offset[1];
+
+          const localX  = -att.width / 2  + (offX / origW) * att.width;
+          const localY  = -att.height / 2 + (offY / origH) * att.height;
+          const localX2 =  att.width / 2  - ((origW - offX - sizeW) / origW) * att.width;
+          const localY2 =  att.height / 2 - ((origH - offY - sizeH) / origH) * att.height;
+
+          const localToCanvas = (ax, ay) => {
+            const bx = la * ax + lb * ay + att.x;
+            const by = lc * ax + ld * ay + att.y;
+            const wx = bone.m00 * bx + bone.m01 * by + bone.worldX;
+            const wy = bone.m10 * bx + bone.m11 * by + bone.worldY;
+            return toCanvasPt(wx, wy);
+          };
+
+          const p0 = localToCanvas(localX,  localY2);
+          const p1 = localToCanvas(localX2, localY2);
+          const p2 = localToCanvas(localX,  localY);
+
+          const iw = dynReg.canvas.width;
+          const ih = dynReg.canvas.height;
+
+          targetCtx.save();
+          targetCtx.transform(
+            (p1.x - p0.x) / iw,
+            (p1.y - p0.y) / iw,
+            (p2.x - p0.x) / ih,
+            (p2.y - p0.y) / ih,
+            p0.x,
+            p0.y
+          );
+          targetCtx.drawImage(dynReg.canvas, 0, 0);
+          targetCtx.restore();
+          continue;
+        }
+      }
+
+      const partCanvas = partsDict[regName] || partsDict[att.name] || partsDict[slot.attachmentName];
+      if (!partCanvas) continue;
+
+      if (att.type === 'region') {
+        const rad = att.rotation * Math.PI / 180;
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        const la = cos * att.scaleX;
+        const lb = -sin * att.scaleY;
+        const lc = sin * att.scaleX;
+        const ld = cos * att.scaleY;
+
+        const hw = att.width / 2;
+        const hh = att.height / 2;
+
+        const localToCanvas = (ax, ay) => {
+          const bx = la * ax + lb * ay + att.x;
+          const by = lc * ax + ld * ay + att.y;
+          const wx = bone.m00 * bx + bone.m01 * by + bone.worldX;
+          const wy = bone.m10 * bx + bone.m11 * by + bone.worldY;
+          return toCanvasPt(wx, wy);
+        };
+
+        const p0 = localToCanvas(-hw,  hh);
+        const p1 = localToCanvas( hw,  hh);
+        const p2 = localToCanvas(-hw, -hh);
+
+        const iw = partCanvas.width;
+        const ih = partCanvas.height;
+
+        targetCtx.save();
+        targetCtx.transform(
+          (p1.x - p0.x) / iw,
+          (p1.y - p0.y) / iw,
+          (p2.x - p0.x) / ih,
+          (p2.y - p0.y) / ih,
+          p0.x,
+          p0.y
+        );
+        targetCtx.drawImage(partCanvas, 0, 0);
+        targetCtx.restore();
+
+      } else if (att.type === 'mesh' || att.type === 'skinnedmesh') {
+        const worldPts = [];
+        if (att.type === 'mesh') {
+          const vCount = att.vertices.length >> 1;
+          for (let v = 0; v < vCount; v++) {
+            const lx = att.vertices[v * 2];
+            const ly = att.vertices[v * 2 + 1];
+            const wx = bone.m00 * lx + bone.m01 * ly + bone.worldX;
+            const wy = bone.m10 * lx + bone.m11 * ly + bone.worldY;
+            worldPts.push(toCanvasPt(wx, wy));
+          }
+        } else {
+          const vCount = att.weights.length;
+          for (let v = 0; v < vCount; v++) {
+            const influences = att.weights[v];
+            let wx = 0, wy = 0;
+            for (let k = 0; k < influences.length; k++) {
+              const inf = influences[k];
+              const b = bones[inf.boneIndex];
+              if (!b) continue;
+              wx += (b.m00 * inf.vx + b.m01 * inf.vy + b.worldX) * inf.weight;
+              wy += (b.m10 * inf.vx + b.m11 * inf.vy + b.worldY) * inf.weight;
+            }
+            worldPts.push(toCanvasPt(wx, wy));
+          }
+        }
+
+        const iw = partCanvas.width;
+        const ih = partCanvas.height;
+        const tris = att.triangles;
+        const uvs = att.uvs;
+
+        for (let t = 0; t < tris.length; t += 3) {
+          const i0 = tris[t], i1 = tris[t + 1], i2 = tris[t + 2];
+          if (!worldPts[i0] || !worldPts[i1] || !worldPts[i2]) continue;
+          drawTexturedTriangle(
+            targetCtx, partCanvas,
+            uvs[i0 * 2] * iw, uvs[i0 * 2 + 1] * ih,
+            uvs[i1 * 2] * iw, uvs[i1 * 2 + 1] * ih,
+            uvs[i2 * 2] * iw, uvs[i2 * 2 + 1] * ih,
+            worldPts[i0].x, worldPts[i0].y,
+            worldPts[i1].x, worldPts[i1].y,
+            worldPts[i2].x, worldPts[i2].y
+          );
+        }
+      }
+    }
+  }
+}
+
+function rebuildRefReconstructedCache() {
+  refCacheCtx.clearRect(0, 0, W, H);
+  refBoundsMetrics = null;
+  if (!refSkelData) return;
+
+  if (refPngImg && refAtlasRegions && Object.keys(refSlicedParts).length > 0) {
+    renderSkelWithPartsMap(refCacheCtx, refSlicedParts, false, false);
+
+    const rData = refCacheCtx.getImageData(0, 0, W, H).data;
+    let rMinX = W, rMinY = H, rMaxX = 0, rMaxY = 0, found = false;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (rData[(y * W + x) * 4 + 3] > 15) {
+          found = true;
+          if (x < rMinX) rMinX = x; if (x > rMaxX) rMaxX = x;
+          if (y < rMinY) rMinY = y; if (y > rMaxY) rMaxY = y;
+        }
+      }
+    }
+    if (found) {
+      refBoundsMetrics = {
+        minX: rMinX, minY: rMinY,
+        w: rMaxX - rMinX + 1,
+        h: rMaxY - rMinY + 1
+      };
+    }
+  }
+  refCacheValid = true;
+}
+
+function drawSkeletonBonesOverlay(targetCtx, invZoom = 1.0) {
+  if (!refSkelData) return;
+  const { bones } = refSkelData;
+  const toCanvasPt = (wx, wy) => ({
+    x: SPINE_SPACE.rootX + wx,
+    y: SPINE_SPACE.rootY - wy
+  });
+
+  targetCtx.save();
+  targetCtx.strokeStyle = '#00ffcc';
+  targetCtx.lineWidth = 2 * invZoom;
+  for (let i = 1; i < bones.length; i++) {
+    const b = bones[i];
+    if (b.parent <= 0) continue;
+    const p = bones[b.parent];
+    if (!p) continue;
+    const c1 = toCanvasPt(p.worldX, p.worldY);
+    const c2 = toCanvasPt(b.worldX, b.worldY);
+    targetCtx.beginPath();
+    targetCtx.moveTo(c1.x, c1.y);
+    targetCtx.lineTo(c2.x, c2.y);
+    targetCtx.stroke();
+  }
+  for (let i = 0; i < bones.length; i++) {
+    const b = bones[i];
+    const c = toCanvasPt(b.worldX, b.worldY);
+    targetCtx.fillStyle = (b.name === 'hips' || b.name === 'root') ? '#ffeb3b' : '#00ffcc';
+    targetCtx.beginPath();
+    targetCtx.arc(c.x, c.y, 4 * invZoom, 0, Math.PI * 2);
+    targetCtx.fill();
+  }
+  targetCtx.restore();
+}
+
+function drawReferenceSkeletonReconstruction(targetCtx) {
+  if (!document.getElementById('showRefSkeletonCb').checked) return;
+  if (!refPngImg && !refAtlasRegions && !refSkelData) return;
+
+  const showBones = document.getElementById('showRefBonesCb').checked;
+
+  targetCtx.save();
+  targetCtx.globalAlpha = 0.3;
+
+  if (refSkelData) {
+    if (!refCacheValid) {
+      rebuildRefReconstructedCache();
+    }
+    targetCtx.drawImage(refCacheCanvas, 0, 0);
+    if (showBones) {
+      drawSkeletonBonesOverlay(targetCtx, 1.0);
+    }
+  } else if (refPngImg && refAtlasRegions && Object.keys(refSlicedParts).length > 0) {
+    const entries = Object.entries(refSlicedParts);
+    const cols = 5;
+    entries.forEach(([name, partCanvas], idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const cx = 140 + col * 155;
+      const cy = 110 + row * 125;
+      const fit = Math.min(130 / partCanvas.width, 100 / partCanvas.height, 1);
+      const dw = partCanvas.width * fit;
+      const dh = partCanvas.height * fit;
+      targetCtx.drawImage(partCanvas, cx - dw / 2, cy - dh / 2, dw, dh);
+    });
+  } else if (refPngImg) {
+    const fit = Math.min((W - 100) / refPngImg.width, (H - 100) / refPngImg.height);
+    const dw = refPngImg.width * fit;
+    const dh = refPngImg.height * fit;
+    targetCtx.drawImage(refPngImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  }
+
+  targetCtx.restore();
+
+  if (refSkelData && refAtlasRegions && document.getElementById('showHostUvBoundsCb').checked) {
+    const invZ = 1 / zoomLevel;
+    targetCtx.save();
+    zonesList.forEach(z => {
+      const regName = z.hostSlot;
+      if (!regName) return;
+      const tInfo = getHostRegionTransformInfo(regName);
+      if (!tInfo || !tInfo.fwd) return;
+      const { fwd, origW, origH } = tInfo;
+      const mapPt = (u, v) => ({
+        x: fwd.a * u + fwd.c * v + fwd.e,
+        y: fwd.b * u + fwd.d * v + fwd.f
+      });
+      const c0 = mapPt(0, 0);
+      const c1 = mapPt(origW, 0);
+      const c2 = mapPt(origW, origH);
+      const c3 = mapPt(0, origH);
+
+      targetCtx.strokeStyle = z.colorHex;
+      targetCtx.lineWidth = 1.5 * invZ;
+      targetCtx.setLineDash([5 * invZ, 4 * invZ]);
+      targetCtx.beginPath();
+      targetCtx.moveTo(c0.x, c0.y);
+      targetCtx.lineTo(c1.x, c1.y);
+      targetCtx.lineTo(c2.x, c2.y);
+      targetCtx.lineTo(c3.x, c3.y);
+      targetCtx.closePath();
+      targetCtx.stroke();
+      targetCtx.setLineDash([]);
+
+      targetCtx.fillStyle = z.colorHex;
+      targetCtx.font = `bold ${Math.round(11 * invZ)}px "Segoe UI", sans-serif`;
+      targetCtx.fillText(`#${z.id}[${regName}] (${origW}×${origH})`, c0.x + 4 * invZ, c0.y + 12 * invZ);
+    });
+    targetCtx.restore();
+  }
+}
+
+function drawTargetCharActualDimensionsOnCanvas(targetCtx) {
+  if (!document.getElementById('showDimRulerCb').checked) return;
+
+  const invZ = 1 / zoomLevel;
+  const rx = SPINE_SPACE.rootX;
+  const ry = SPINE_SPACE.rootY;
+
+  targetCtx.save();
+
+  targetCtx.strokeStyle = 'rgba(255, 152, 0, 0.65)';
+  targetCtx.lineWidth = 1.5 * invZ;
+  targetCtx.setLineDash([6 * invZ, 4 * invZ]);
+  targetCtx.beginPath();
+  targetCtx.moveTo(40, ry);
+  targetCtx.lineTo(W - 40, ry);
+  targetCtx.moveTo(rx, ry - 40 * invZ);
+  targetCtx.lineTo(rx, ry + 25 * invZ);
+  targetCtx.stroke();
+  targetCtx.setLineDash([]);
+
+  targetCtx.fillStyle = '#ff9800';
+  targetCtx.beginPath();
+  targetCtx.arc(rx, ry, 5 * invZ, 0, Math.PI * 2);
+  targetCtx.fill();
+  targetCtx.font = `bold ${Math.round(11 * invZ)}px "Segoe UI", sans-serif`;
+  targetCtx.fillText(`root Origin (${rx}, ${ry}) [Spine (0,0)]`, rx + 8 * invZ, ry + 15 * invZ);
+
+  if (!charImg) {
+    targetCtx.restore();
+    return;
+  }
+
+  const { rawW, rawH, cropW, cropH, dx, dy, dw, dh, scale } = CHAR_METRICS;
+  if (cropW <= 0 || cropH <= 0) {
+    targetCtx.restore();
+    return;
+  }
+
+  const pct = Math.round(scale * 100);
+
+  targetCtx.strokeStyle = '#ffeb3b';
+  targetCtx.lineWidth = 1.5 * invZ;
+  targetCtx.setLineDash([4 * invZ, 3 * invZ]);
+  targetCtx.strokeRect(dx, dy, dw, dh);
+  targetCtx.setLineDash([]);
+
+  targetCtx.strokeStyle = 'rgba(255, 235, 59, 0.85)';
+  targetCtx.fillStyle = '#ffeb3b';
+  targetCtx.font = `${Math.round(10 * invZ)}px "Segoe UI", sans-serif`;
+  const stepRealPx = 50;
+  for (let px = 0; px <= cropW; px += stepRealPx) {
+    const sx = dx + px * scale;
+    targetCtx.beginPath();
+    targetCtx.moveTo(sx, dy);
+    targetCtx.lineTo(sx, dy - 6 * invZ);
+    targetCtx.stroke();
+  }
+  for (let py = 0; py <= cropH; py += stepRealPx) {
+    const sy = ry - py * scale;
+    targetCtx.beginPath();
+    targetCtx.moveTo(dx, sy);
+    targetCtx.lineTo(dx - 6 * invZ, sy);
+    targetCtx.stroke();
+  }
+
+  targetCtx.restore();
+
+  targetCtx.save();
+  targetCtx.fillStyle = 'rgba(15, 15, 15, 0.88)';
+  targetCtx.strokeStyle = '#555';
+  targetCtx.lineWidth = 1;
+  const hudH = refBoundsMetrics ? 66 : 48;
+  targetCtx.fillRect(10, 10, 495, hudH);
+  targetCtx.strokeRect(10, 10, 495, hudH);
+
+  targetCtx.font = 'bold 12px "Segoe UI", sans-serif';
+  targetCtx.fillStyle = '#ffeb3b';
+  targetCtx.fillText(`📐 Target Image Bounds: ${cropW} × ${cropH} px (Raw ${rawW} × ${rawH} px)`, 18, 28);
+  targetCtx.fillStyle = '#00e5ff';
+  targetCtx.fillText(`🔗 Working Scale: ${pct}% ｜ Canvas: ${W}×${H} px ｜ Zones: ${zonesList.length}`, 18, 46);
+
+  if (refBoundsMetrics) {
+    const rwDisp = refBoundsMetrics.w;
+    const rhDisp = refBoundsMetrics.h;
+    targetCtx.fillStyle = '#00ffcc';
+    targetCtx.fillText(`🦴 Host Rig Bounds: ${rwDisp} × ${rhDisp} px (Target/Host Height Ratio: ${(dh / Math.max(1, rhDisp)).toFixed(2)}x)`, 18, 62);
+  }
+  targetCtx.restore();
+}
+
+const undoStack = [];
+const MAX_UNDO = 30;
+const undoBtn = document.getElementById('undoBtn');
+
+function saveUndoSnapshot() {
+  if (!charImg && zonesList.length === 4) return;
+  undoStack.push({
+    map: new Uint8Array(zoneMap),
+    putty: new Uint8Array(puttyMap),
+    masterMap: new Uint8Array(masterZoneMap),
+    masterPutty: new Uint8Array(masterPuttyMap),
+    zones: JSON.parse(JSON.stringify(zonesList)),
+    activeBrush: currentBrushZone
+  });
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  undoBtn.disabled = false;
+}
+
+function performUndo() {
+  if (undoStack.length === 0) return;
+  const prev = undoStack.pop();
+  zoneMap.set(prev.map);
+  if (prev.putty) puttyMap.set(prev.putty);
+  if (prev.masterMap) masterZoneMap.set(prev.masterMap);
+  if (prev.masterPutty) masterPuttyMap.set(prev.masterPutty);
+  zonesList = prev.zones;
+  currentBrushZone = prev.activeBrush;
+  undoBtn.disabled = (undoStack.length === 0);
+
+  renderZoneManagerUI();
+  renderBrushButtonsUI();
+  renderJointSelectUI();
+  renderBLayerTogglesUI();
+  rebuildZoneCache();
+  renderAll();
+  statusMsg.style.color = '#f0c674';
+  statusMsg.textContent = `↩ Undid last action (Remaining undo steps: ${undoStack.length})`;
+}
+
+undoBtn.onclick = performUndo;
+window.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    e.preventDefault();
+    performUndo();
+  }
+});
+
+function updateJointSummaryUI() {
+  const parts = zonesList.map(z => {
+    const pCount = z.putty ? z.putty.pixelCount : 0;
+    if (!pCount) return `#${z.id}${z.name}(None)`;
+    return `#${z.id}${z.name}(Putty/${z.putty.colored ? '🎨Colored' : '⚪White'})`;
+  });
+  document.getElementById('jointSummaryText').textContent = 'Putty Status: ' + parts.join(' | ');
+}
+
+let zoomLevel = 1.0;
+let panX = 0;
+let panY = 0;
+let panModeActive = false;
+let isDraggingPan = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let startPanX = 0;
+let startPanY = 0;
+
+function clampPanBounds() {
+  const minPanX = W * (1 - zoomLevel);
+  const minPanY = H * (1 - zoomLevel);
+  panX = Math.min(0, Math.max(minPanX, panX));
+  panY = Math.min(0, Math.max(minPanY, panY));
+}
+
+let pZoomLevel = 1.0;
+let pPanX = 0;
+let pPanY = 0;
+let pPanModeActive = false;
+let pDragTexModeActive = true;
+let isDraggingPreviewPan = false;
+let isDraggingPreviewTex = false;
+let pDragStartX = 0;
+let pDragStartY = 0;
+let pStartPanX = 0;
+let pStartPanY = 0;
+let pStartTexDx = 0;
+let pStartTexDy = 0;
+
+const pZoomRange = document.getElementById('pZoomRange');
+const pZoomValText = document.getElementById('pZoomValText');
+const pTogglePanBtn = document.getElementById('pTogglePanBtn');
+const pToggleDragTexBtn = document.getElementById('pToggleDragTexBtn');
+const pResetViewBtn = document.getElementById('pResetViewBtn');
+
+function clampPreviewPanBounds() {
+  const minPanX = W * (1 - pZoomLevel);
+  const minPanY = H * (1 - pZoomLevel);
+  pPanX = Math.min(0, Math.max(minPanX, pPanX));
+  pPanY = Math.min(0, Math.max(minPanY, pPanY));
+}
+
+function updatePreviewCursor() {
+  if (isDraggingPreviewPan) {
+    previewCanvas.style.cursor = 'grabbing';
+  } else if (pPanModeActive) {
+    previewCanvas.style.cursor = 'grab';
+  } else if (pDragTexModeActive) {
+    previewCanvas.style.cursor = 'move';
+  } else {
+    previewCanvas.style.cursor = 'default';
+  }
+}
+
+function applyPreviewZoomAt(newZoom, centerX = W / 2, centerY = H / 2) {
+  const targetZoom = Math.min(8.0, Math.max(1.0, newZoom));
+  const worldX = (centerX - pPanX) / pZoomLevel;
+  const worldY = (centerY - pPanY) / pZoomLevel;
+
+  pZoomLevel = targetZoom;
+  pPanX = centerX - worldX * pZoomLevel;
+  pPanY = centerY - worldY * pZoomLevel;
+  clampPreviewPanBounds();
+
+  const pct = Math.round(pZoomLevel * 100);
+  pZoomRange.value = pct;
+  pZoomValText.textContent = pct + '%';
+  renderAnimatedPreview();
+}
+
+pZoomRange.oninput = e => {
+  const pct = parseInt(e.target.value, 10) || 100;
+  applyPreviewZoomAt(pct / 100, W / 2, H / 2);
+};
+
+pTogglePanBtn.onclick = () => {
+  pPanModeActive = !pPanModeActive;
+  if (pPanModeActive) {
+    pDragTexModeActive = false;
+    pToggleDragTexBtn.classList.remove('tex-drag-active');
+    pToggleDragTexBtn.textContent = '🎯 Left-Drag Texture Pos';
+  }
+  pTogglePanBtn.classList.toggle('pan-active', pPanModeActive);
+  pTogglePanBtn.textContent = pPanModeActive ? '✋ Pan Mode (ON)' : '✋ Pan Mode';
+  updatePreviewCursor();
+};
+
+pToggleDragTexBtn.onclick = () => {
+  pDragTexModeActive = !pDragTexModeActive;
+  if (pDragTexModeActive) {
+    pPanModeActive = false;
+    pTogglePanBtn.classList.remove('pan-active');
+    pTogglePanBtn.textContent = '✋ Pan Mode';
+  }
+  pToggleDragTexBtn.classList.toggle('tex-drag-active', pDragTexModeActive);
+  pToggleDragTexBtn.textContent = pDragTexModeActive ? '🎯 Left-Drag Texture Pos (ON)' : '🎯 Left-Drag Texture Pos';
+  updatePreviewCursor();
+};
+
+pResetViewBtn.onclick = () => {
+  pZoomLevel = 1.0;
+  pPanX = 0;
+  pPanY = 0;
+  pZoomRange.value = 100;
+  pZoomValText.textContent = '100%';
+  renderAnimatedPreview();
+};
+
+previewCanvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = previewCanvas.getBoundingClientRect();
+  const cx = (e.clientX - rect.left) * (W / rect.width);
+  const cy = (e.clientY - rect.top) * (H / rect.height);
+  const step = e.deltaY < 0 ? 0.25 : -0.25;
+  applyPreviewZoomAt(pZoomLevel + step, cx, cy);
+}, { passive: false });
+
+previewCanvas.addEventListener('contextmenu', e => e.preventDefault());
+
+previewCanvas.onmousedown = e => {
+  const rect = previewCanvas.getBoundingClientRect();
+  const curX = (e.clientX - rect.left) * (W / rect.width);
+  const curY = (e.clientY - rect.top) * (H / rect.height);
+
+  if (e.button === 2 || e.button === 1 || pPanModeActive) {
+    e.preventDefault();
+    isDraggingPreviewPan = true;
+    pDragStartX = curX;
+    pDragStartY = curY;
+    pStartPanX = pPanX;
+    pStartPanY = pPanY;
+    updatePreviewCursor();
+    return;
+  }
+
+  if (e.button === 0 && pDragTexModeActive && charImg) {
+    const zId = parseInt(document.getElementById('jointSelect').value, 10);
+    const zObj = getZoneById(zId);
+    if (!zObj) return;
+    saveUndoSnapshot();
+    isDraggingPreviewTex = true;
+    pDragStartX = curX;
+    pDragStartY = curY;
+    pStartTexDx = zObj.texTune.dx || 0;
+    pStartTexDy = zObj.texTune.dy || 0;
+  }
+};
+
+document.getElementById('bShowShadowLayerCb').onchange = () => renderAnimatedPreview();
+document.getElementById('bShowBonesOverlayCb').onchange = () => renderAnimatedPreview();
+
+document.getElementById('bShowAllLayersBtn').onclick = () => {
+  zonesList.forEach(z => { z.visibleInPreview = true; });
+  document.getElementById('bShowShadowLayerCb').checked = true;
+  renderBLayerTogglesUI();
+  renderAnimatedPreview();
+};
+
+document.getElementById('bSoloCurrentLayerBtn').onclick = () => {
+  const curId = parseInt(document.getElementById('jointSelect').value, 10);
+  zonesList.forEach(z => { z.visibleInPreview = (z.id === curId); });
+  renderBLayerTogglesUI();
+  renderAnimatedPreview();
+  statusMsg.style.color = '#00ffcc';
+  statusMsg.textContent = `👁️ Solo View Active: Showing only Part #${curId} (Does not affect Section C full atlas export)`;
+};
+
+function applySelectedZoneTexTune(prop, val, fast = true) {
+  const zId = parseInt(document.getElementById('jointSelect').value, 10);
+  const zObj = getZoneById(zId);
+  if (!zObj) return;
+  zObj.texTune[prop] = val;
+  syncTexTuneUIFromSelectedZone();
+  scheduleRenderAll(fast);
+}
+
+['Dx', 'Dy', 'Rot', 'Scale'].forEach(suffix => {
+  const prop = suffix.toLowerCase();
+  const slider = document.getElementById('texTune' + suffix);
+  const num = document.getElementById('texTune' + suffix + 'Num');
+  slider.onmousedown = () => saveUndoSnapshot();
+  slider.oninput = e => applySelectedZoneTexTune(prop, parseInt(e.target.value, 10) || 0, true);
+  slider.onchange = e => applySelectedZoneTexTune(prop, parseInt(e.target.value, 10) || 0, false);
+  num.onchange = e => {
+    saveUndoSnapshot();
+    applySelectedZoneTexTune(prop, parseInt(e.target.value, 10) || 0, false);
+  };
+});
+
+document.getElementById('snapTexToHostBoneBtn').onclick = () => {
+  if (!refSkelData) {
+    statusMsg.style.color = '#f0c674';
+    statusMsg.textContent = '⚠️ Please upload the Host Skeleton (.skel) first to snap yellow pivot to host bone!';
+    return;
+  }
+  const zId = parseInt(document.getElementById('jointSelect').value, 10);
+  const zObj = getZoneById(zId);
+  if (!zObj || !zObj.hostSlot) {
+    statusMsg.style.color = '#f0c674';
+    statusMsg.textContent = '⚠️ This part is not mapped to any Host slot yet!';
+    return;
+  }
+  const bone = findBoneForHostSlot(zObj.hostSlot);
+  if (!bone) return;
+
+  saveUndoSnapshot();
+  const boneCanvasX = Math.round(SPINE_SPACE.rootX + bone.worldX);
+  const boneCanvasY = Math.round(SPINE_SPACE.rootY - bone.worldY);
+  zObj.texTune.dx = boneCanvasX - zObj.pivot.x;
+  zObj.texTune.dy = boneCanvasY - zObj.pivot.y;
+  syncTexTuneUIFromSelectedZone();
+  renderAll();
+  statusMsg.style.color = '#00ffcc';
+  statusMsg.textContent = `🔗 Snapped [#${zObj.id} ${zObj.name}] yellow pivot (${zObj.pivot.x}, ${zObj.pivot.y}) to Host Bone [${bone.name}] (${boneCanvasX}, ${boneCanvasY})!`;
+};
+
+document.getElementById('resetTexTuneBtn').onclick = () => {
+  const zId = parseInt(document.getElementById('jointSelect').value, 10);
+  const zObj = getZoneById(zId);
+  if (!zObj) return;
+  saveUndoSnapshot();
+  zObj.texTune = { dx: 0, dy: 0, rot: 0, scale: 100 };
+  syncTexTuneUIFromSelectedZone();
+  renderAll();
+  statusMsg.style.color = '#4cd964';
+  statusMsg.textContent = `↺ Reset texture offset parameters for [#${zObj.id} ${zObj.name}]`;
+};
+
+function updateSurgicalCursor() {
+  if (isDraggingPan) {
+    surgicalCanvas.style.cursor = 'grabbing';
+  } else if (panModeActive) {
+    surgicalCanvas.style.cursor = 'grab';
+  } else if (interactionMode === 'drag') {
+    if (draggingPivotZoneId !== null) {
+      surgicalCanvas.style.cursor = 'grabbing';
+    } else if (hoveredPivotZoneId !== null) {
+      surgicalCanvas.style.cursor = 'move';
+    } else {
+      surgicalCanvas.style.cursor = 'default';
+    }
+  } else {
+    surgicalCanvas.style.cursor = 'crosshair';
+  }
+}
+
+function rebuildZoneCache(specificZoneId = null) {
+  if (!charImg) return;
+  if (specificZoneId !== null) {
+    zoneCache[specificZoneId] = extractZoneCanvas(specificZoneId);
+  } else {
+    zoneCache = {};
+    zonesList.forEach(z => {
+      zoneCache[z.id] = extractZoneCanvas(z.id);
+    });
+  }
+  updateJointSummaryUI();
+}
+
+function inPoly(u, v, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1];
+    const xj = poly[j][0], yj = poly[j][1];
+    if (((yi > v) !== (yj > v)) && (u < (xj - xi) * (v - yi) / (yj - yi + 1e-9) + xi)) inside = !inside;
+  }
+  return inside;
+}
+
+const POLY_SECONDARY = [
+  [0.00, 0.10], [0.27, 0.10], [0.27, 0.35], [0.16, 0.36],
+  [0.11, 0.43], [0.11, 0.59], [0.18, 0.64], [0.34, 0.65],
+  [0.425, 0.59], [0.405, 0.81], [0.25, 0.89], [0.00, 0.89]
+];
+
+const POLY_LEG_R = [
+  [0.415, 0.57], [0.525, 0.59], [0.515, 0.77], [0.455, 0.85],
+  [0.465, 0.99], [0.320, 0.99], [0.335, 0.86], [0.405, 0.77]
+];
+
+const POLY_LEG_L = [
+  [0.526, 0.62], [0.635, 0.58], [0.645, 0.77], [0.695, 0.92],
+  [0.695, 0.99], [0.515, 0.99], [0.515, 0.82]
+];
+
+function setInteractionMode(mode) {
+  interactionMode = mode;
+  interactionModeSelect.value = mode;
+  modeBoxContainer.classList.toggle('drag-active', mode === 'drag');
+  modeBoxContainer.classList.toggle('putty-active', mode === 'putty_add' || mode === 'putty_erase');
+  puttyPaintBtn.classList.toggle('active', mode === 'putty_add');
+  puttyEraseBtn.classList.toggle('active', mode === 'putty_erase');
+
+  const zId = parseInt(document.getElementById('jointSelect').value, 10);
+  const zObj = getZoneById(zId) || zonesList[0];
+
+  if (mode === 'drag') {
+    statusMsg.style.color = '#ff9800';
+    statusMsg.textContent = '🎯 Switched to [Pivot Drag Mode]: Click and drag any yellow joint pivot on Canvas A';
+  } else if (mode === 'putty_add') {
+    hoveredPivotZoneId = null;
+    draggingPivotZoneId = null;
+    statusMsg.style.color = '#00ffff';
+    statusMsg.textContent = `🧱 Activated [Putty Brush] (Target: #${zObj ? zObj.id + ' ' + zObj.name : ''}): Paint around joint seams on Canvas A to add underlay putty`;
+  } else if (mode === 'putty_erase') {
+    hoveredPivotZoneId = null;
+    draggingPivotZoneId = null;
+    statusMsg.style.color = '#00ffff';
+    statusMsg.textContent = `🧹 Activated [Putty Eraser] (Target: #${zObj ? zObj.id + ' ' + zObj.name : ''}): Paint on Canvas A to erase putty for this part`;
+  } else {
+    hoveredPivotZoneId = null;
+    draggingPivotZoneId = null;
+    statusMsg.style.color = '#4cd964';
+    statusMsg.textContent = '🖌️ Switched to [Paint Zone Mode]: Paint on Canvas A to assign pixels to part zones';
+  }
+  renderBrushButtonsUI();
+  updateSurgicalCursor();
+  renderSurgicalView();
+}
+
+interactionModeSelect.onchange = e => setInteractionMode(e.target.value);
+
+puttyPaintBtn.onclick = () => {
+  setInteractionMode(interactionMode === 'putty_add' ? 'paint' : 'putty_add');
+};
+
+puttyEraseBtn.onclick = () => {
+  setInteractionMode(interactionMode === 'putty_erase' ? 'paint' : 'putty_erase');
+};
+
+function loadImg(file, cb) {
+  if (!file) return;
+  statusMsg.style.color = '#f0c674';
+  statusMsg.textContent = 'Status: Loading image ' + file.name + ' ...';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      statusMsg.style.color = '#4cd964';
+      statusMsg.textContent = `✅ Losslessly loaded: ${file.name} (${img.width} × ${img.height})`;
+      cb(img);
+    };
+    img.onerror = () => {
+      statusMsg.style.color = '#ff4d4d';
+      statusMsg.textContent = '❌ Image parsing failed. Please verify the file is a valid image.';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+const charScaleSlider = document.getElementById('charScaleSlider');
+const charScaleVal = document.getElementById('charScaleVal');
+
+const alphaThresholdSlider = document.getElementById('alphaThreshold');
+const alphaThresholdNum = document.getElementById('alphaThresholdNum');
+const alphaThreshValSpan = document.getElementById('alphaThreshVal');
+
+const defringeSlider = document.getElementById('defringeStrength');
+const defringeNum = document.getElementById('defringeStrengthNum');
+const defringeValSpan = document.getElementById('defringeVal');
+
+document.getElementById('charInput').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  loadImg(file, img => {
+    charImg = img;
+    undoStack.length = 0;
+    undoBtn.disabled = true;
+    SPINE_SPACE.scale = 1.0;
+    charScaleSlider.value = 100;
+    charScaleVal.textContent = '100%';
+    puttyMap.fill(0);
+    masterPuttyMap.fill(0);
+    zonesList.forEach(z => {
+      z.putty.colored = false;
+      z.putty.pixelCount = 0;
+      z.texTune = { dx: 0, dy: 0, rot: 0, scale: 100 };
+    });
+    syncTexTuneUIFromSelectedZone();
+    processCharAndAutoZone(true);
+    if (refSkelData) snapPivotsToMasterHostBones();
+    rebuildZoneCache();
+    renderAll();
+  });
+};
+
+let scaleRafPending = false;
+function applyCharacterMatrixScale(newPct, isFinalRelease = false) {
+  const clampedPct = Math.min(150, Math.max(70, newPct));
+  charScaleSlider.value = clampedPct;
+  charScaleVal.textContent = clampedPct + '%';
+  SPINE_SPACE.scale = clampedPct / 100;
+
+  if (!charImg || CHAR_METRICS.cropW <= 0) return;
+
+  if (scaleRafPending && !isFinalRelease) return;
+  scaleRafPending = true;
+  requestAnimationFrame(() => {
+    scaleRafPending = false;
+    projectCroppedCharToCanvas(false);
+    rebuildZoneCache();
+    renderOutputAtlas(false, !isFinalRelease);
+    renderSurgicalView();
+    renderAnimatedPreview();
+    statusMsg.style.color = '#00e5ff';
+    statusMsg.textContent = `🔗 Updated Target Image Working Scale: ${clampedPct}% (Scale = ${SPINE_SPACE.scale.toFixed(2)})`;
+  });
+}
+
+charScaleSlider.onmousedown = () => saveUndoSnapshot();
+charScaleSlider.oninput = e => applyCharacterMatrixScale(parseInt(e.target.value, 10) || 100, false);
+charScaleSlider.onchange = e => applyCharacterMatrixScale(parseInt(e.target.value, 10) || 100, true);
+
+document.getElementById('charReset100Btn').onclick = () => {
+  saveUndoSnapshot();
+  applyCharacterMatrixScale(100, true);
+};
+document.getElementById('showDimRulerCb').onchange = () => renderSurgicalView();
+document.getElementById('showPuttyOverlayCb').onchange = () => renderSurgicalView();
+
+let filterRafPending = false;
+function scheduleFilterRebuild(fast = true) {
+  if (!charImg) return;
+  if (filterRafPending && fast) return;
+  filterRafPending = true;
+  requestAnimationFrame(() => {
+    filterRafPending = false;
+    processCharAndAutoZone(false);
+    rebuildZoneCache();
+    renderOutputAtlas(false, fast);
+    renderSurgicalView();
+    renderAnimatedPreview();
+  });
+}
+
+function syncAlphaThresholdUI(val, fast = true) {
+  const clamped = Math.min(255, Math.max(0, parseInt(val, 10) || 0));
+  alphaThresholdSlider.value = clamped;
+  alphaThresholdNum.value = clamped;
+  alphaThreshValSpan.textContent = clamped;
+  scheduleFilterRebuild(fast);
+  statusMsg.style.color = '#00e5ff';
+  statusMsg.textContent = clamped === 0
+    ? '✂️ Edge Alpha Cutoff is OFF (0 = 100% original alpha pass-through)'
+    : `✂️ Edge Alpha Cutoff set to ${clamped}/255`;
+}
+
+function syncDefringeUI(val, fast = true) {
+  const clamped = Math.min(255, Math.max(0, parseInt(val, 10) || 0));
+  defringeSlider.value = clamped;
+  defringeNum.value = clamped;
+  defringeValSpan.textContent = clamped;
+  scheduleFilterRebuild(fast);
+  statusMsg.style.color = '#4cd964';
+  statusMsg.textContent = clamped === 0
+    ? '🧼 Edge White Defringe is OFF (0 = 100% original color pass-through)'
+    : `🧼 Edge White Defringe set to ${clamped}/255 (Black ink outlines 100% protected)`;
+}
+
+alphaThresholdSlider.oninput = e => syncAlphaThresholdUI(e.target.value, true);
+alphaThresholdSlider.onchange = e => syncAlphaThresholdUI(e.target.value, false);
+alphaThresholdNum.onchange = e => syncAlphaThresholdUI(e.target.value, false);
+
+defringeSlider.oninput = e => syncDefringeUI(e.target.value, true);
+defringeSlider.onchange = e => syncDefringeUI(e.target.value, false);
+defringeNum.onchange = e => syncDefringeUI(e.target.value, false);
+
+document.getElementById('autoCornerBgCb').onchange = () => scheduleFilterRebuild(false);
+document.getElementById('hardAlphaEdgeCb').onchange = () => scheduleFilterRebuild(false);
+
+function updateRefStatusMessage() {
+  const hasPng = !!refPngImg;
+  const hasAtlas = !!refAtlasRegions;
+  const hasSkel = !!refSkelData;
+  if (hasPng && hasAtlas && hasSkel) {
+    statusMsg.style.color = '#4cd964';
+    statusMsg.textContent = `✅ Master Host (${refAtlasHeader.pngName} / Spine ${refSkelData.version}) 3-in-1 loaded losslessly! Partial Pass-Through & 3-in-1 export ready!`;
+  } else {
+    const loaded = [];
+    const missing = [];
+    if (hasPng) loaded.push('.png'); else missing.push('.png');
+    if (hasAtlas) loaded.push(`.atlas(${Object.keys(refAtlasRegions).length} regions)`); else missing.push('.atlas');
+    if (hasSkel) loaded.push(`.skel(${refSkelData.bones.length} bones)`); else missing.push('.skel');
+    statusMsg.style.color = '#f0c674';
+    statusMsg.textContent = `⏳ Host Loaded: ${loaded.join(' + ')} ｜ Still needed: ${missing.join(', ')}`;
+  }
+  updateExportButtonLabel();
+}
+
+document.getElementById('refPngInput').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  loadImg(file, img => {
+    refPngImg = img;
+    rebuildRefSlicedParts();
+    renderAll();
+    updateRefStatusMessage();
+  });
+};
+
+document.getElementById('refAtlasInput').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    refAtlasRegions = parseAtlasFileText(ev.target.result);
+    const autoBase = refAtlasHeader.pngName.replace(/\.(png|jpg|jpeg)$/i, '');
+    if (autoBase) {
+      exportNameInput.value = autoBase;
+    }
+    autoMatchHostSlotsForZones();
+    renderZoneManagerUI();
+    renderJointSelectUI();
+    renderBLayerTogglesUI();
+    rebuildRefSlicedParts();
+    renderAll();
+    updateRefStatusMessage();
+  };
+  reader.readAsText(file);
+};
+
+document.getElementById('refSkelInput').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      refSkelRawBuffer = ev.target.result.slice(0);
+      refSkelData = parseSkelBinary(ev.target.result);
+      refCacheValid = false;
+
+      if (!refAtlasRegions && exportNameInput.value === 'character.sprite.walk') {
+        const cleanSkelName = file.name.replace(/(\.org)?\.skel$/i, '').replace(/_\d+$/i, '');
+        if (cleanSkelName) exportNameInput.value = cleanSkelName;
+      }
+
+      autoMatchHostSlotsForZones();
+      snapPivotsToMasterHostBones();
+      renderZoneManagerUI();
+      renderJointSelectUI();
+      renderBLayerTogglesUI();
+      if (charImg) rebuildZoneCache();
+      renderAll();
+      updateRefStatusMessage();
+    } catch (err) {
+      console.error(err);
+      statusMsg.style.color = '#ff4d4d';
+      statusMsg.textContent = `❌ Host .skel parsing failed: ${err.message}`;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+document.getElementById('showRefSkeletonCb').onchange = () => renderSurgicalView();
+document.getElementById('showRefBonesCb').onchange = () => renderSurgicalView();
+
+const jointSelect = document.getElementById('jointSelect');
+
+jointSelect.onchange = () => {
+  syncTexTuneUIFromSelectedZone();
+  if (interactionMode === 'putty_add' || interactionMode === 'putty_erase') {
+    setInteractionMode(interactionMode);
+  }
+  renderSurgicalView();
+  renderAnimatedPreview();
+};
+
+document.getElementById('autoColorBtn').onclick = () => {
+  if (!charImg) return;
+  const zId = parseInt(jointSelect.value, 10);
+  const zObj = getZoneById(zId);
+  if (!zObj) return;
+  saveUndoSnapshot();
+  zObj.putty.colored = true;
+  rebuildZoneCache(zId);
+  renderAll();
+  statusMsg.style.color = '#4cd964';
+  statusMsg.textContent = `🎨 Auto-colored putty for [#${zObj.id} ${zObj.name}] by sampling seam colors!`;
+};
+
+document.getElementById('whitePuttyViewBtn').onclick = () => {
+  if (!charImg) return;
+  const zId = parseInt(jointSelect.value, 10);
+  const zObj = getZoneById(zId);
+  if (!zObj) return;
+  saveUndoSnapshot();
+  zObj.putty.colored = false;
+  rebuildZoneCache(zId);
+  renderAll();
+  statusMsg.style.color = '#00ffff';
+  statusMsg.textContent = `⚪ Reset [#${zObj.id} ${zObj.name}] putty to pure white view mode!`;
+};
+
+document.getElementById('clearPuttyBtn').onclick = () => {
+  if (!charImg) return;
+  const zId = parseInt(jointSelect.value, 10);
+  const zObj = getZoneById(zId);
+  if (!zObj) return;
+  saveUndoSnapshot();
+  for (let i = 0; i < W * H; i++) {
+    if (puttyMap[i] === zId) puttyMap[i] = 0;
+    if (masterPuttyMap[i] === zId) masterPuttyMap[i] = 0;
+  }
+  zObj.putty.colored = false;
+  zObj.putty.pixelCount = 0;
+  rebuildZoneCache(zId);
+  renderAll();
+  statusMsg.style.color = '#f0c674';
+  statusMsg.textContent = `🗑️ Cleared all painted putty for [#${zObj.id} ${zObj.name}]!`;
+};
+
+document.getElementById('brushSize').oninput = e => {
+  document.getElementById('bSizeVal').textContent = e.target.value;
+};
+
+document.getElementById('showColorZones').onchange = () => renderSurgicalView();
+
+document.getElementById('resetZonesBtn').onclick = () => {
+  if (charImg) {
+    saveUndoSnapshot();
+    puttyMap.fill(0);
+    masterPuttyMap.fill(0);
+    zonesList.forEach(z => {
+      z.putty.colored = false;
+      z.putty.pixelCount = 0;
+      z.texTune = { dx: 0, dy: 0, rot: 0, scale: 100 };
+    });
+    syncTexTuneUIFromSelectedZone();
+    processCharAndAutoZone(true);
+    if (refSkelData) snapPivotsToMasterHostBones();
+    rebuildZoneCache();
+    renderAll();
+  }
+};
+
+const zoomRange = document.getElementById('zoomRange');
+const zoomValText = document.getElementById('zoomValText');
+const togglePanBtn = document.getElementById('togglePanBtn');
+const resetViewBtn = document.getElementById('resetViewBtn');
+
+function applyZoomAt(newZoom, centerX = W / 2, centerY = H / 2) {
+  const targetZoom = Math.min(8.0, Math.max(1.0, newZoom));
+  const worldX = (centerX - panX) / zoomLevel;
+  const worldY = (centerY - panY) / zoomLevel;
+
+  zoomLevel = targetZoom;
+  panX = centerX - worldX * zoomLevel;
+  panY = centerY - worldY * zoomLevel;
+  clampPanBounds();
+
+  const pct = Math.round(zoomLevel * 100);
+  zoomRange.value = pct;
+  zoomValText.textContent = pct + '%';
+  renderSurgicalView();
+}
+
+zoomRange.oninput = e => {
+  const pct = parseInt(e.target.value, 10) || 100;
+  applyZoomAt(pct / 100, W / 2, H / 2);
+};
+
+togglePanBtn.onclick = () => {
+  panModeActive = !panModeActive;
+  togglePanBtn.classList.toggle('pan-active', panModeActive);
+  togglePanBtn.textContent = panModeActive ? '✋ Toggle Pan Mode (ON)' : '✋ Toggle Pan Mode';
+  updateSurgicalCursor();
+};
+
+resetViewBtn.onclick = () => {
+  zoomLevel = 1.0;
+  panX = 0;
+  panY = 0;
+  zoomRange.value = 100;
+  zoomValText.textContent = '100%';
+  renderSurgicalView();
+};
+
+surgicalCanvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = surgicalCanvas.getBoundingClientRect();
+  const cx = (e.clientX - rect.left) * (W / rect.width);
+  const cy = (e.clientY - rect.top) * (H / rect.height);
+  const step = e.deltaY < 0 ? 0.25 : -0.25;
+  applyZoomAt(zoomLevel + step, cx, cy);
+}, { passive: false });
+
+surgicalCanvas.addEventListener('contextmenu', e => e.preventDefault());
+
+function applyAlphaThresholdAndDefringeToImageData(imgData, w, h, alphaThresh, defringeStr, convertSolidBg, hardEdge) {
+  const d = imgData.data;
+  const totalPixels = w * h;
+
+  const exteriorEmpty = new Uint8Array(totalPixels);
+  const bfsQueue = new Int32Array(totalPixels);
+  let qHead = 0, qTail = 0;
+
+  if (convertSolidBg && d[3] > 220) {
+    const bgR = d[0], bgG = d[1], bgB = d[2];
+    const visitedBg = new Uint8Array(totalPixels);
+    qHead = 0; qTail = 0;
+
+    const tryEnqueueBg = (idx) => {
+      if (visitedBg[idx]) return;
+      const i = idx * 4;
+      const dist = Math.sqrt(((d[i] - bgR) ** 2 + (d[i + 1] - bgG) ** 2 + (d[i + 2] - bgB) ** 2) / 3);
+      if (dist <= 85) {
+        visitedBg[idx] = 1;
+        bfsQueue[qTail++] = idx;
+      }
+    };
+
+    for (let x = 0; x < w; x++) {
+      tryEnqueueBg(x);
+      tryEnqueueBg((h - 1) * w + x);
+    }
+    for (let y = 1; y < h - 1; y++) {
+      tryEnqueueBg(y * w);
+      tryEnqueueBg(y * w + (w - 1));
+    }
+
+    while (qHead < qTail) {
+      const curr = bfsQueue[qHead++];
+      const i = curr * 4;
+      const dist = Math.sqrt(((d[i] - bgR) ** 2 + (d[i + 1] - bgG) ** 2 + (d[i + 2] - bgB) ** 2) / 3);
+      const eqAlpha = dist <= 12 ? 0 : Math.min(255, Math.max(0, Math.round(((dist - 12) / 73) * 255)));
+      if (eqAlpha < d[i + 3]) d[i + 3] = eqAlpha;
+
+      if (dist <= 55) {
+        const cx = curr % w;
+        const cy = (curr / w) | 0;
+        if (cx > 0)     tryEnqueueBg(curr - 1);
+        if (cx < w - 1) tryEnqueueBg(curr + 1);
+        if (cy > 0)     tryEnqueueBg(curr - w);
+        if (cy < h - 1) tryEnqueueBg(curr + w);
+      }
+    }
+  }
+
+  qHead = 0; qTail = 0;
+  const tryEnqueueExt = (idx) => {
+    if (exteriorEmpty[idx]) return;
+    if (d[idx * 4 + 3] === 0) {
+      exteriorEmpty[idx] = 1;
+      bfsQueue[qTail++] = idx;
+    }
+  };
+
+  for (let x = 0; x < w; x++) {
+    tryEnqueueExt(x);
+    tryEnqueueExt((h - 1) * w + x);
+  }
+  for (let y = 1; y < h - 1; y++) {
+    tryEnqueueExt(y * w);
+    tryEnqueueExt(y * w + (w - 1));
+  }
+
+  while (qHead < qTail) {
+    const curr = bfsQueue[qHead++];
+    const cx = curr % w;
+    const cy = (curr / w) | 0;
+    if (cx > 0)     tryEnqueueExt(curr - 1);
+    if (cx < w - 1) tryEnqueueExt(curr + 1);
+    if (cy > 0)     tryEnqueueExt(curr - w);
+    if (cy < h - 1) tryEnqueueExt(curr + w);
+  }
+
+  const touchesExterior = (idx) => {
+    const cx = idx % w;
+    const cy = (idx / w) | 0;
+    if (cx === 0 || cx === w - 1 || cy === 0 || cy === h - 1) return true;
+    return (
+      exteriorEmpty[idx - 1] === 1 ||
+      exteriorEmpty[idx + 1] === 1 ||
+      exteriorEmpty[idx - w] === 1 ||
+      exteriorEmpty[idx + w] === 1 ||
+      exteriorEmpty[idx - w - 1] === 1 ||
+      exteriorEmpty[idx - w + 1] === 1 ||
+      exteriorEmpty[idx + w - 1] === 1 ||
+      exteriorEmpty[idx + w + 1] === 1
+    );
+  };
+
+  if (alphaThresh > 0) {
+    const maxEdgePeelPasses = 3;
+    for (let pass = 0; pass < maxEdgePeelPasses; pass++) {
+      const toPeel = [];
+      for (let idx = 0; idx < totalPixels; idx++) {
+        if (exteriorEmpty[idx]) continue;
+        const a = d[idx * 4 + 3];
+        if (a <= alphaThresh && touchesExterior(idx)) {
+          toPeel.push(idx);
+        }
+      }
+      if (toPeel.length === 0) break;
+      for (let k = 0; k < toPeel.length; k++) {
+        const idx = toPeel[k];
+        d[idx * 4 + 3] = 0;
+        exteriorEmpty[idx] = 1;
+      }
+    }
+  }
+
+  if (defringeStr > 0) {
+    const passes = defringeStr > 150 ? 2 : 1;
+    for (let p = 0; p < passes; p++) {
+      const toStrip = [];
+      for (let idx = 0; idx < totalPixels; idx++) {
+        if (exteriorEmpty[idx]) continue;
+        if (!touchesExterior(idx)) continue;
+
+        const i = idx * 4;
+        const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+        const minCh = Math.min(r, g, b);
+        const isWhiteFringe = minCh >= (255 - defringeStr);
+        const isLowAlphaLightFringe = a < 180 && minCh > (245 - defringeStr);
+
+        if (isWhiteFringe || isLowAlphaLightFringe) {
+          toStrip.push(idx);
+        }
+      }
+      if (toStrip.length === 0) break;
+      for (let k = 0; k < toStrip.length; k++) {
+        const idx = toStrip[k];
+        d[idx * 4 + 3] = 0;
+        exteriorEmpty[idx] = 1;
+      }
+    }
+  }
+
+  if (hardEdge) {
+    for (let idx = 0; idx < totalPixels; idx++) {
+      if (!exteriorEmpty[idx] && touchesExterior(idx) && d[idx * 4 + 3] > 0) {
+        d[idx * 4 + 3] = 255;
+      }
+    }
+  }
+}
+
+function processCharAndAutoZone(resetZones = true) {
+  if (!charImg) return;
+
+  const alphaThresh = Math.min(255, Math.max(0, parseInt(alphaThresholdSlider.value, 10) || 0));
+  const defringeStr = Math.min(255, Math.max(0, parseInt(defringeSlider.value, 10) || 0));
+  const useCornerBg = document.getElementById('autoCornerBgCb').checked;
+  const hardEdge = document.getElementById('hardAlphaEdgeCb').checked;
+
+  const iw = charImg.width, ih = charImg.height;
+  const tmp = document.createElement('canvas');
+  tmp.width = iw; tmp.height = ih;
+  const tCtx = tmp.getContext('2d');
+  tCtx.drawImage(charImg, 0, 0);
+  const imgData = tCtx.getImageData(0, 0, iw, ih);
+
+  if (alphaThresh > 0 || defringeStr > 0 || useCornerBg || hardEdge) {
+    applyAlphaThresholdAndDefringeToImageData(imgData, iw, ih, alphaThresh, defringeStr, useCornerBg, hardEdge);
+    tCtx.putImageData(imgData, 0, 0);
+  }
+
+  const d = imgData.data;
+  let minX = iw, minY = ih, maxX = 0, maxY = 0;
+  for (let y = 0; y < ih; y++) {
+    for (let x = 0; x < iw; x++) {
+      const i = (y * iw + x) * 4;
+      if (d[i + 3] > 0) {
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  if (maxX < minX || maxY < minY) {
+    minX = 0; minY = 0; maxX = iw - 1; maxY = ih - 1;
+  }
+
+  const bw = Math.max(1, maxX - minX + 1);
+  const bh = Math.max(1, maxY - minY + 1);
+
+  rawCroppedCanvas.width = bw;
+  rawCroppedCanvas.height = bh;
+  rawCroppedCtx.clearRect(0, 0, bw, bh);
+  rawCroppedCtx.drawImage(tmp, minX, minY, bw, bh, 0, 0, bw, bh);
+
+  CHAR_METRICS.rawW = iw;
+  CHAR_METRICS.rawH = ih;
+  CHAR_METRICS.minX = minX;
+  CHAR_METRICS.minY = minY;
+  CHAR_METRICS.cropW = bw;
+  CHAR_METRICS.cropH = bh;
+
+  if (resetZones) {
+    masterZoneMap.fill(0);
+    masterPuttyMap.fill(0);
+    const mDx = Math.round(SPINE_SPACE.rootX - bw / 2);
+    const mDy = Math.round(SPINE_SPACE.rootY - bh);
+    const fallbackId = zonesList[0] ? zonesList[0].id : 1;
+    const hasZ2 = !!getZoneById(2);
+    const hasZ3 = !!getZoneById(3);
+    const hasZ4 = !!getZoneById(4);
+
+    for (let y = Math.max(0, mDy); y < Math.min(H, mDy + bh); y++) {
+      for (let x = Math.max(0, mDx); x < Math.min(W, mDx + bw); x++) {
+        const u = (x - mDx) / bw;
+        const v = (y - mDy) / bh;
+        const mIdx = y * W + x;
+        if (hasZ3 && inPoly(u, v, POLY_LEG_R)) {
+          masterZoneMap[mIdx] = 3;
+        } else if (hasZ4 && inPoly(u, v, POLY_LEG_L)) {
+          masterZoneMap[mIdx] = 4;
+        } else if (hasZ2 && inPoly(u, v, POLY_SECONDARY)) {
+          masterZoneMap[mIdx] = 2;
+        } else {
+          masterZoneMap[mIdx] = fallbackId;
+        }
+      }
+    }
+
+    if (!refSkelData) {
+      const z1 = getZoneById(1); if (z1) { z1.pivot.wx = Math.round((0.51 - 0.5) * bw); z1.pivot.wy = Math.round((1 - 0.62) * bh); }
+      const z2 = getZoneById(2); if (z2) { z2.pivot.wx = Math.round((0.42 - 0.5) * bw); z2.pivot.wy = Math.round((1 - 0.68) * bh); }
+      const z3 = getZoneById(3); if (z3) { z3.pivot.wx = Math.round((0.46 - 0.5) * bw); z3.pivot.wy = Math.round((1 - 0.67) * bh); }
+      const z4 = getZoneById(4); if (z4) { z4.pivot.wx = Math.round((0.57 - 0.5) * bw); z4.pivot.wy = Math.round((1 - 0.68) * bh); }
+    }
+  }
+
+  projectCroppedCharToCanvas(resetZones);
+}
+
+function smoothPuttyMapMorphology(mapArr) {
+  const copy = new Uint8Array(mapArr);
+  for (let y = 1; y < H - 1; y++) {
+    const row = y * W;
+    for (let x = 1; x < W - 1; x++) {
+      const idx = row + x;
+      const cur = copy[idx];
+      let neighborCount = 0;
+      let dominantId = cur;
+      for (let dy = -1; dy <= 1; dy++) {
+        const nr = (y + dy) * W;
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          const v = copy[nr + x + dx];
+          if (v > 0) {
+            neighborCount++;
+            if (!dominantId) dominantId = v;
+          }
+        }
+      }
+      if (cur === 0 && neighborCount >= 5 && dominantId > 0) {
+        mapArr[idx] = dominantId;
+      } else if (cur > 0 && neighborCount <= 1) {
+        mapArr[idx] = 0;
+      }
+    }
+  }
+}
+
+function projectCroppedCharToCanvas(resetZones) {
+  cleanCtx.clearRect(0, 0, W, H);
+  const bw = CHAR_METRICS.cropW;
+  const bh = CHAR_METRICS.cropH;
+  if (bw <= 0 || bh <= 0) return;
+
+  const scale = SPINE_SPACE.scale;
+  const dw = Math.max(1, Math.round(bw * scale));
+  const dh = Math.max(1, Math.round(bh * scale));
+
+  const dx = Math.round(SPINE_SPACE.rootX - dw / 2);
+  const dy = Math.round(SPINE_SPACE.rootY - dh);
+
+  CHAR_METRICS.dx = dx;
+  CHAR_METRICS.dy = dy;
+  CHAR_METRICS.dw = dw;
+  CHAR_METRICS.dh = dh;
+  CHAR_METRICS.scale = scale;
+
+  const pct = Math.round(scale * 100);
+  charDimBadge.textContent = `📐 Target Char Bounds: ${bw}×${bh} px (Raw ${CHAR_METRICS.rawW}×${CHAR_METRICS.rawH}) ｜ Working Scale ${pct}% -> Projected: ${dw}×${dh} px`;
+
+  cleanCtx.drawImage(rawCroppedCanvas, 0, 0, bw, bh, dx, dy, dw, dh);
+
+  syncPivotsWithSpineSpace();
+
+  const cData = cleanCtx.getImageData(0, 0, W, H).data;
+  zoneMap.fill(0);
+  puttyMap.fill(0);
+
+  const fallbackId = zonesList[0] ? zonesList[0].id : 1;
+  const rx = SPINE_SPACE.rootX;
+  const ry = SPINE_SPACE.rootY;
+  const invScale = 1 / scale;
+
+  for (let y = 0; y < H; y++) {
+    const my = Math.round(ry + (y - ry) * invScale);
+    if (my < 0 || my >= H) continue;
+    const mRow = my * W;
+    const row = y * W;
+
+    for (let x = 0; x < W; x++) {
+      const mx = Math.round(rx + (x - rx) * invScale);
+      if (mx < 0 || mx >= W) continue;
+      const mIdx = mRow + mx;
+      const idx = row + x;
+
+      const pz = masterPuttyMap[mIdx];
+      if (pz > 0 && getZoneById(pz)) {
+        puttyMap[idx] = pz;
+      }
+
+      if (cData[idx * 4 + 3] > 0) {
+        const oz = masterZoneMap[mIdx];
+        zoneMap[idx] = (oz > 0 && getZoneById(oz)) ? oz : fallbackId;
+      }
+    }
+  }
+
+  if (Math.abs(scale - 1.0) > 0.005) {
+    smoothPuttyMapMorphology(puttyMap);
+  }
+}
+
+function extractZoneCanvas(targetZoneId) {
+  const zObj = getZoneById(targetZoneId);
+  if (!zObj) return null;
+
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+
+  const puttyCanvas = document.createElement('canvas');
+  puttyCanvas.width = W; puttyCanvas.height = H;
+  const puttyCtx = puttyCanvas.getContext('2d');
+
+  const srcData = cleanCtx.getImageData(0, 0, W, H);
+  const outImg = ctx.createImageData(W, H);
+  const puttyImg = puttyCtx.createImageData(W, H);
+  const s = srcData.data;
+  const d = outImg.data;
+  const pd = puttyImg.data;
+
+  let minX = W, minY = H, maxX = 0, maxY = 0, hasPixels = false;
+  let coreMinX = W, coreMinY = H, coreMaxX = 0, coreMaxY = 0, hasCorePixels = false;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const idx = y * W + x;
+      if (zoneMap[idx] === targetZoneId && s[idx * 4 + 3] > 0) {
+        const i = idx * 4;
+        d[i]     = s[i];
+        d[i + 1] = s[i + 1];
+        d[i + 2] = s[i + 2];
+        d[i + 3] = s[i + 3];
+        hasPixels = true;
+        hasCorePixels = true;
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+        if (x < coreMinX) coreMinX = x; if (x > coreMaxX) coreMaxX = x;
+        if (y < coreMinY) coreMinY = y; if (y > coreMaxY) coreMaxY = y;
+      }
+    }
+  }
+
+  const puttyPixels = [];
+  let hasPutty = false;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const idx = y * W + x;
+      if (puttyMap[idx] === targetZoneId) {
+        const i = idx * 4;
+        if (d[i + 3] === 0) {
+          pd[i]     = 255;
+          pd[i + 1] = 255;
+          pd[i + 2] = 255;
+          pd[i + 3] = 255;
+          hasPutty = true;
+          hasPixels = true;
+          puttyPixels.push({ x, y, i });
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        }
+      }
+    }
+  }
+
+  zObj.putty.pixelCount = puttyPixels.length;
+  if (!hasPixels) return null;
+
+  if (zObj.putty.colored && puttyPixels.length > 0 && hasCorePixels) {
+    const isValidDarkOrFlesh = (px, py) => {
+      if (px < 0 || px >= W || py < 0 || py >= H) return false;
+      const pi = (py * W + px) * 4;
+      const pr = d[pi], pg = d[pi + 1], pb = d[pi + 2], pa = d[pi + 3];
+      return pa >= 200 && !(pr > 215 && pg > 215 && pb > 215);
+    };
+
+    const candidates = [];
+    for (let cy = coreMinY; cy <= coreMaxY; cy++) {
+      for (let cx = coreMinX; cx <= coreMaxX; cx++) {
+        if (!isValidDarkOrFlesh(cx, cy)) continue;
+        if (!isValidDarkOrFlesh(cx - 1, cy) || !isValidDarkOrFlesh(cx + 1, cy) ||
+            !isValidDarkOrFlesh(cx, cy - 1) || !isValidDarkOrFlesh(cx, cy + 1)) {
+          const ci = (cy * W + cx) * 4;
+          candidates.push({
+            x: cx,
+            y: cy,
+            r: d[ci],
+            g: d[ci + 1],
+            b: d[ci + 2],
+            a: d[ci + 3]
+          });
+        }
+      }
+    }
+
+    if (candidates.length > 0) {
+      for (let k = 0; k < puttyPixels.length; k++) {
+        const wp = puttyPixels[k];
+        let bestDistSq = Infinity;
+        let bestCand = null;
+        for (let m = 0; m < candidates.length; m++) {
+          const cand = candidates[m];
+          const distSq = (wp.x - cand.x) * (wp.x - cand.x) + (wp.y - cand.y) * (wp.y - cand.y);
+          if (distSq < bestDistSq) {
+            bestDistSq = distSq;
+            bestCand = cand;
+          }
+        }
+        if (bestCand) {
+          pd[wp.i]     = bestCand.r;
+          pd[wp.i + 1] = bestCand.g;
+          pd[wp.i + 2] = bestCand.b;
+          pd[wp.i + 3] = bestCand.a;
+        }
+      }
+    }
+  }
+
+  ctx.putImageData(outImg, 0, 0);
+  if (hasPutty) puttyCtx.putImageData(puttyImg, 0, 0);
+  return {
+    fullCanvas: c,
+    puttyCanvas: hasPutty ? puttyCanvas : null,
+    minX,
+    minY,
+    w: maxX - minX + 1,
+    h: maxY - minY + 1
+  };
+}
+
+function renderSurgicalView() {
+  sCtx.clearRect(0, 0, W, H);
+  sCtx.save();
+  sCtx.translate(panX, panY);
+  sCtx.scale(zoomLevel, zoomLevel);
+
+  if (charImg) {
+    zonesList.forEach(z => {
+      const ex = zoneCache[z.id];
+      if (ex && ex.puttyCanvas) {
+        sCtx.drawImage(ex.puttyCanvas, 0, 0);
+      }
+    });
+  }
+
+  sCtx.drawImage(cleanCharCanvas, 0, 0);
+
+  if (document.getElementById('showColorZones').checked && charImg) {
+    const overlay = sCtx.createImageData(W, H);
+    const od = overlay.data;
+    const colorLookup = {};
+    zonesList.forEach(z => { colorLookup[z.id] = z.overlayRgba; });
+
+    for (let idx = 0; idx < W * H; idx++) {
+      const zId = zoneMap[idx];
+      if (zId > 0 && colorLookup[zId]) {
+        const c = colorLookup[zId];
+        const i = idx * 4;
+        od[i] = c[0]; od[i+1] = c[1]; od[i+2] = c[2]; od[i+3] = c[3];
+      }
+    }
+    const tmp = document.createElement('canvas');
+    tmp.width = W; tmp.height = H;
+    tmp.getContext('2d').putImageData(overlay, 0, 0);
+    sCtx.drawImage(tmp, 0, 0);
+  }
+
+  const selectedZoneId = parseInt(jointSelect.value, 10);
+  if (document.getElementById('showPuttyOverlayCb').checked && charImg) {
+    const pOverlay = sCtx.createImageData(W, H);
+    const pod = pOverlay.data;
+    let anyPutty = false;
+
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const idx = y * W + x;
+        const pz = puttyMap[idx];
+        if (pz === 0) continue;
+        anyPutty = true;
+
+        const isBorder =
+          x === 0 || x === W - 1 || y === 0 || y === H - 1 ||
+          puttyMap[idx - 1] !== pz || puttyMap[idx + 1] !== pz ||
+          puttyMap[idx - W] !== pz || puttyMap[idx + W] !== pz;
+
+        const i = idx * 4;
+        if (isBorder) {
+          pod[i]     = (pz === selectedZoneId) ? 0 : 255;
+          pod[i + 1] = 255;
+          pod[i + 2] = 255;
+          pod[i + 3] = 230;
+        } else {
+          const stripe = ((x + y) % 6 < 3);
+          pod[i]     = 255;
+          pod[i + 1] = 255;
+          pod[i + 2] = 255;
+          pod[i + 3] = (pz === selectedZoneId) ? (stripe ? 140 : 75) : 55;
+        }
+      }
+    }
+    if (anyPutty) {
+      const pTmp = document.createElement('canvas');
+      pTmp.width = W; pTmp.height = H;
+      pTmp.getContext('2d').putImageData(pOverlay, 0, 0);
+      sCtx.drawImage(pTmp, 0, 0);
+    }
+  }
+
+  drawReferenceSkeletonReconstruction(sCtx);
+  drawTargetCharActualDimensionsOnCanvas(sCtx);
+
+  zonesList.forEach(z => {
+    const p = z.pivot;
+    const isDraggingThis = (draggingPivotZoneId === z.id);
+    const isHoveredThis = (interactionMode === 'drag' && hoveredPivotZoneId === z.id);
+
+    if (interactionMode === 'drag') {
+      sCtx.save();
+      sCtx.strokeStyle = (isDraggingThis || isHoveredThis) ? '#00ff66' : z.colorHex;
+      sCtx.lineWidth = (isDraggingThis || isHoveredThis ? 2.5 : 1.5) / zoomLevel;
+      sCtx.setLineDash([3 / zoomLevel, 2 / zoomLevel]);
+      sCtx.beginPath();
+      sCtx.arc(p.x, p.y, 14 / zoomLevel, 0, Math.PI * 2);
+      sCtx.stroke();
+      sCtx.restore();
+    }
+
+    sCtx.fillStyle = (isDraggingThis || isHoveredThis) ? '#00ff66' : ((z.id === selectedZoneId) ? '#ff9800' : '#ffeb3b');
+    sCtx.strokeStyle = z.colorHex;
+    sCtx.lineWidth = 2.2 / zoomLevel;
+    sCtx.beginPath();
+    sCtx.arc(p.x, p.y, (isDraggingThis || isHoveredThis ? 8.5 : 7) / zoomLevel, 0, Math.PI * 2);
+    sCtx.fill();
+    sCtx.stroke();
+
+    sCtx.save();
+    sCtx.font = `bold ${Math.round(11 / zoomLevel)}px "Segoe UI", sans-serif`;
+    const lbl = (interactionMode === 'drag' || isDraggingThis)
+      ? `#${z.id} ${z.name} (${p.x},${p.y}) [W:${Math.round(p.wx)},${Math.round(p.wy)}]`
+      : `#${z.id} ${z.name}`;
+    const tw = sCtx.measureText(lbl).width;
+    sCtx.fillStyle = 'rgba(0, 0, 0, 0.78)';
+    sCtx.fillRect(p.x + 9 / zoomLevel, p.y - 9 / zoomLevel, tw + 6 / zoomLevel, 15 / zoomLevel);
+    sCtx.fillStyle = (isDraggingThis || isHoveredThis) ? '#00ff66' : z.colorHex;
+    sCtx.fillText(lbl, p.x + 12 / zoomLevel, p.y + 3 / zoomLevel);
+    sCtx.restore();
+  });
+
+  sCtx.restore();
+}
+
+function renderAnimatedPreview() {
+  pCtx.clearRect(0, 0, W, H);
+  pCtx.save();
+  pCtx.translate(pPanX, pPanY);
+  pCtx.scale(pZoomLevel, pZoomLevel);
+
+  const showShadow = document.getElementById('bShowShadowLayerCb').checked;
+  const showBones = document.getElementById('bShowBonesOverlayCb').checked;
+
+  if (!charImg) {
+    if (refSkelData && Object.keys(dynamicPackedAtlas.regions).length > 0) {
+      const fallbackDict = {};
+      for (const [k, v] of Object.entries(dynamicPackedAtlas.regions)) {
+        if (v.used && (v.fullOrigCanvas || v.canvas)) {
+          fallbackDict[k] = v.fullOrigCanvas || v.canvas;
+        }
+      }
+      renderSkelWithPartsMap(pCtx, fallbackDict, true, true);
+    }
+    if (showBones && refSkelData) {
+      drawSkeletonBonesOverlay(pCtx, 1 / pZoomLevel);
+    }
+    pCtx.restore();
+    return;
+  }
+
+  const s = isAnimating ? Math.sin(animTime) : 0;
+  const c = isAnimating ? Math.cos(animTime) : 0;
+
+  if (refSkelData && !isAnimating && document.getElementById('previewHostRigCb').checked && Object.keys(dynamicPackedAtlas.regions).length > 0) {
+    const fallbackDict = {};
+    for (const [k, v] of Object.entries(dynamicPackedAtlas.regions)) {
+      if (v.used && (v.fullOrigCanvas || v.canvas)) {
+        fallbackDict[k] = v.fullOrigCanvas || v.canvas;
+      }
+    }
+    renderSkelWithPartsMap(pCtx, fallbackDict, true, true);
+    if (showBones) {
+      drawSkeletonBonesOverlay(pCtx, 1 / pZoomLevel);
+    }
+    pCtx.restore();
+    return;
+  }
+
+  if (showShadow && refTightSlices['shadow']) {
+    const sh = refTightSlices['shadow'].tightCanvas;
+    pCtx.drawImage(sh, SPINE_SPACE.rootX - sh.width / 2, SPINE_SPACE.rootY - sh.height / 2);
+  }
+
+  const getZoneAnimMotion = z => {
+    const sc = SPINE_SPACE.scale;
+    if (z.role === 'body')      return { dx: 0, dy: Math.abs(s) * 8 * sc,      rot: s * 0.03 };
+    if (z.role === 'secondary') return { dx: 0, dy: Math.abs(s) * 8 * sc,      rot: c * 0.12 };
+    if (z.role === 'leg_L')     return { dx: 0, dy: Math.max(0, c * 14) * sc,  rot: -s * 0.22 };
+    if (z.role === 'leg_R')     return { dx: 0, dy: Math.max(0, -c * 14) * sc, rot: s * 0.22 };
+    if (z.role === 'head')      return { dx: 0, dy: Math.abs(s) * 9 * sc,      rot: -s * 0.05 };
+    if (z.role === 'arm_R')     return { dx: 0, dy: Math.abs(s) * 8 * sc,      rot: -s * 0.18 };
+    if (z.role === 'arm_L')     return { dx: 0, dy: Math.abs(s) * 8 * sc,      rot: s * 0.18 };
+    return { dx: 0, dy: Math.abs(s) * 8 * sc, rot: c * 0.10 };
+  };
+
+  zonesList.forEach(z => {
+    if (!z.visibleInPreview) return;
+    const extracted = zoneCache[z.id];
+    if (!extracted || !extracted.puttyCanvas) return;
+    const m = getZoneAnimMotion(z);
+    const tune = z.texTune || { dx: 0, dy: 0, rot: 0, scale: 100 };
+    const tScale = (tune.scale !== undefined ? tune.scale : 100) / 100;
+    const tRad = ((tune.rot || 0) * Math.PI) / 180;
+
+    pCtx.save();
+    pCtx.translate(z.pivot.x + m.dx + (tune.dx || 0), z.pivot.y + m.dy + (tune.dy || 0));
+    pCtx.rotate(m.rot + tRad);
+    pCtx.scale(tScale, tScale);
+    pCtx.drawImage(extracted.puttyCanvas, -z.pivot.x, -z.pivot.y);
+    pCtx.restore();
+  });
+
+  zonesList.forEach(z => {
+    if (!z.visibleInPreview) return;
+    const extracted = zoneCache[z.id];
+    if (!extracted) return;
+    const m = getZoneAnimMotion(z);
+    const tune = z.texTune || { dx: 0, dy: 0, rot: 0, scale: 100 };
+    const tScale = (tune.scale !== undefined ? tune.scale : 100) / 100;
+    const tRad = ((tune.rot || 0) * Math.PI) / 180;
+
+    pCtx.save();
+    pCtx.translate(z.pivot.x + m.dx + (tune.dx || 0), z.pivot.y + m.dy + (tune.dy || 0));
+    pCtx.rotate(m.rot + tRad);
+    pCtx.scale(tScale, tScale);
+    pCtx.drawImage(extracted.fullCanvas, -z.pivot.x, -z.pivot.y);
+    pCtx.restore();
+  });
+
+  if (showBones && refSkelData) {
+    drawSkeletonBonesOverlay(pCtx, 1 / pZoomLevel);
+  }
+
+  pCtx.restore();
+}
+
+function renderOutputAtlas(forExport = false, fastInteractive = false) {
+  dynamicPackedAtlas = { width: 1024, height: 512, regions: {} };
+  const allowUnclipped = document.getElementById('unclippedBakeCb').checked;
+  const unmappedPolicy = document.getElementById('unmappedSlotPolicySelect').value;
+
+  const baseRegions = refAtlasRegions || {
+    Tail:   { xy: [2, 43],    size: [394, 726], orig: [394, 726], offset: [0, 0], rot: true, index: -1 },
+    Body:   { xy: [735, 4],   size: [431, 800], orig: [431, 800], offset: [0, 0], rot: true, index: -1 },
+    leg_R:  { xy: [2576, 33], size: [194, 293], orig: [194, 293], offset: [0, 0], rot: true, index: -1 },
+    leg_L:  { xy: [2815, 249],size: [188, 232], orig: [188, 232], offset: [0, 0], rot: true, index: -1 },
+    Head:   { xy: [2476, 229],size: [208, 337], orig: [208, 337], offset: [0, 0], rot: true, index: -1 },
+    arm_L:  { xy: [2871, 21], size: [91, 226],  orig: [91, 226],  offset: [0, 0], rot: false, index: -1 },
+    Arms:   { xy: [1646, 2],  size: [173, 249], orig: [173, 249], offset: [0, 0], rot: true, index: -1 },
+    shadow: { xy: [3049, 80], size: [357, 63],  orig: [357, 63],  offset: [0, 0], rot: true, index: -1 }
+  };
+
+  for (const [name, info] of Object.entries(baseRegions)) {
+    const origW = info.orig[0] > 0 ? info.orig[0] : info.size[0];
+    const origH = info.orig[1] > 0 ? info.orig[1] : info.size[1];
+    const isShadow = (name.toLowerCase() === 'shadow');
+    const hostSlice = refTightSlices[name];
+
+    if (hostSlice && (isShadow || unmappedPolicy === 'passthrough')) {
+      dynamicPackedAtlas.regions[name] = {
+        name,
+        used: true,
+        isPassthrough: true,
+        canvas: hostSlice.tightCanvas,
+        fullOrigCanvas: hostSlice.origCanvas,
+        xy: [12, 4],
+        size: [hostSlice.size[0], hostSlice.size[1]],
+        orig: [hostSlice.orig[0], hostSlice.orig[1]],
+        offset: [hostSlice.offset[0], hostSlice.offset[1]],
+        rot: false,
+        index: hostSlice.index,
+        zones: isShadow ? ['shadow'] : []
+      };
+    } else {
+      dynamicPackedAtlas.regions[name] = {
+        name,
+        used: false,
+        isPassthrough: false,
+        canvas: null,
+        fullOrigCanvas: null,
+        xy: [2, 2],
+        size: [1, 1],
+        orig: [origW, origH],
+        offset: [0, 0],
+        rot: false,
+        index: info.index !== undefined ? info.index : -1,
+        zones: []
+      };
+    }
+  }
+
+  const slotToZones = {};
+  if (charImg) {
+    zonesList.forEach(z => {
+      const targetSlot = z.hostSlot;
+      if (!targetSlot || !baseRegions[targetSlot]) return;
+      if (!slotToZones[targetSlot]) slotToZones[targetSlot] = [];
+      slotToZones[targetSlot].push(z.id);
+    });
+  }
+
+  for (const [regName, zoneIds] of Object.entries(slotToZones)) {
+    const info = baseRegions[regName];
+    if (!info) continue;
+
+    let zMinX = W, zMinY = H, zMaxX = 0, zMaxY = 0, hasZonePixels = false;
+    zoneIds.forEach(zId => {
+      const ex = zoneCache[zId];
+      const zObj = getZoneById(zId);
+      if (!ex || !zObj) return;
+      hasZonePixels = true;
+      const tMat = getZoneUserTexMatrix(zObj);
+      const corners = [
+        [ex.minX, ex.minY],
+        [ex.minX + ex.w, ex.minY],
+        [ex.minX + ex.w, ex.minY + ex.h],
+        [ex.minX, ex.minY + ex.h]
+      ];
+      corners.forEach(([cx, cy]) => {
+        const tx = tMat.a * cx + tMat.c * cy + tMat.e;
+        const ty = tMat.b * cx + tMat.d * cy + tMat.f;
+        if (tx < zMinX) zMinX = tx;
+        if (ty < zMinY) zMinY = ty;
+        if (tx > zMaxX) zMaxX = tx;
+        if (ty > zMaxY) zMaxY = ty;
+      });
+    });
+    if (!hasZonePixels) continue;
+
+    const origW = info.orig[0] > 0 ? info.orig[0] : info.size[0];
+    const origH = info.orig[1] > 0 ? info.orig[1] : info.size[1];
+    const tInfo = refSkelData ? getHostRegionTransformInfo(regName) : null;
+
+    if (tInfo && tInfo.inv && tInfo.att.type === 'region' && allowUnclipped) {
+      const inv = tInfo.inv;
+      const mapToUV = (cx, cy) => ({
+        u: inv.a * cx + inv.c * cy + inv.e,
+        v: inv.b * cx + inv.d * cy + inv.f
+      });
+      const uvCorners = [
+        mapToUV(zMinX - 3, zMinY - 3),
+        mapToUV(zMaxX + 3, zMinY - 3),
+        mapToUV(zMaxX + 3, zMaxY + 3),
+        mapToUV(zMinX - 3, zMaxY + 3)
+      ];
+      const padMinU = Math.floor(Math.min(...uvCorners.map(p => p.u)));
+      const padMaxU = Math.ceil(Math.max(...uvCorners.map(p => p.u)));
+      const padMinV = Math.floor(Math.min(...uvCorners.map(p => p.v)));
+      const padMaxV = Math.ceil(Math.max(...uvCorners.map(p => p.v)));
+
+      const padW = Math.min(4096, Math.max(1, padMaxU - padMinU));
+      const padH = Math.min(4096, Math.max(1, padMaxV - padMinV));
+
+      const unclippedCanvas = document.createElement('canvas');
+      unclippedCanvas.width = padW;
+      unclippedCanvas.height = padH;
+      const uCtx = unclippedCanvas.getContext('2d');
+
+      const shiftedInv = {
+        a: inv.a, b: inv.b, c: inv.c, d: inv.d,
+        e: inv.e - padMinU, f: inv.f - padMinV
+      };
+
+      zoneIds.forEach(zId => {
+        const ex = zoneCache[zId];
+        const zObj = getZoneById(zId);
+        if (!ex || !ex.puttyCanvas || !zObj) return;
+        const m = multiplyAffine(shiftedInv, getZoneUserTexMatrix(zObj));
+        uCtx.save();
+        uCtx.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+        uCtx.drawImage(ex.puttyCanvas, 0, 0);
+        uCtx.restore();
+      });
+
+      zoneIds.forEach(zId => {
+        const ex = zoneCache[zId];
+        const zObj = getZoneById(zId);
+        if (!ex || !ex.fullCanvas || !zObj) return;
+        const m = multiplyAffine(shiftedInv, getZoneUserTexMatrix(zObj));
+        uCtx.save();
+        uCtx.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+        uCtx.drawImage(ex.fullCanvas, 0, 0);
+        uCtx.restore();
+      });
+
+      if (fastInteractive && !forExport) {
+        const offsetX = Math.round(padMinU);
+        const offsetY = Math.round(origH - (padMinV + padH));
+        dynamicPackedAtlas.regions[regName] = {
+          name: regName,
+          used: true,
+          isPassthrough: false,
+          canvas: unclippedCanvas,
+          fullOrigCanvas: unclippedCanvas,
+          xy: [12, 4],
+          size: [padW, padH],
+          orig: [origW, origH],
+          offset: [offsetX, offsetY],
+          rot: false,
+          index: info.index !== undefined ? info.index : -1,
+          zones: zoneIds
+        };
+      } else {
+        const uData = uCtx.getImageData(0, 0, padW, padH).data;
+        let tMinX = padW, tMinY = padH, tMaxX = 0, tMaxY = 0, found = false;
+        for (let y = 0; y < padH; y++) {
+          for (let x = 0; x < padW; x++) {
+            if (uData[(y * padW + x) * 4 + 3] > 0) {
+              found = true;
+              if (x < tMinX) tMinX = x; if (x > tMaxX) tMaxX = x;
+              if (y < tMinY) tMinY = y; if (y > tMaxY) tMaxY = y;
+            }
+          }
+        }
+
+        if (found) {
+          const rw = tMaxX - tMinX + 1;
+          const rh = tMaxY - tMinY + 1;
+          const tightCanvas = document.createElement('canvas');
+          tightCanvas.width = rw;
+          tightCanvas.height = rh;
+          tightCanvas.getContext('2d').drawImage(unclippedCanvas, tMinX, tMinY, rw, rh, 0, 0, rw, rh);
+
+          const realMinU = padMinU + tMinX;
+          const realMinV = padMinV + tMinY;
+          const realMaxV = realMinV + rh;
+
+          const offsetX = Math.round(realMinU);
+          const offsetY = Math.round(origH - realMaxV);
+
+          dynamicPackedAtlas.regions[regName] = {
+            name: regName,
+            used: true,
+            isPassthrough: false,
+            canvas: tightCanvas,
+            fullOrigCanvas: tightCanvas,
+            xy: [12, 4],
+            size: [rw, rh],
+            orig: [origW, origH],
+            offset: [offsetX, offsetY],
+            rot: false,
+            index: info.index !== undefined ? info.index : -1,
+            zones: zoneIds
+          };
+        }
+      }
+    } else if (tInfo && tInfo.inv) {
+      const inv = tInfo.inv;
+      const upright = document.createElement('canvas');
+      upright.width = origW;
+      upright.height = origH;
+      const uCtx = upright.getContext('2d');
+
+      zoneIds.forEach(zId => {
+        const ex = zoneCache[zId];
+        const zObj = getZoneById(zId);
+        if (!ex || !ex.puttyCanvas || !zObj) return;
+        const m = multiplyAffine(inv, getZoneUserTexMatrix(zObj));
+        uCtx.save();
+        uCtx.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+        uCtx.drawImage(ex.puttyCanvas, 0, 0);
+        uCtx.restore();
+      });
+
+      zoneIds.forEach(zId => {
+        const ex = zoneCache[zId];
+        const zObj = getZoneById(zId);
+        if (!ex || !ex.fullCanvas || !zObj) return;
+        const m = multiplyAffine(inv, getZoneUserTexMatrix(zObj));
+        uCtx.save();
+        uCtx.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+        uCtx.drawImage(ex.fullCanvas, 0, 0);
+        uCtx.restore();
+      });
+
+      if (!fastInteractive && tInfo.att.type === 'region') {
+        const uData = uCtx.getImageData(0, 0, origW, origH).data;
+        let tMinX = origW, tMinY = origH, tMaxX = 0, tMaxY = 0, found = false;
+        for (let y = 0; y < origH; y++) {
+          for (let x = 0; x < origW; x++) {
+            if (uData[(y * origW + x) * 4 + 3] > 0) {
+              found = true;
+              if (x < tMinX) tMinX = x; if (x > tMaxX) tMaxX = x;
+              if (y < tMinY) tMinY = y; if (y > tMaxY) tMaxY = y;
+            }
+          }
+        }
+        if (found) {
+          const rw = tMaxX - tMinX + 1;
+          const rh = tMaxY - tMinY + 1;
+          const tightCanvas = document.createElement('canvas');
+          tightCanvas.width = rw;
+          tightCanvas.height = rh;
+          tightCanvas.getContext('2d').drawImage(upright, tMinX, tMinY, rw, rh, 0, 0, rw, rh);
+
+          const offsetX = tMinX;
+          const offsetY = origH - (tMinY + rh);
+
+          dynamicPackedAtlas.regions[regName] = {
+            name: regName,
+            used: true,
+            isPassthrough: false,
+            canvas: tightCanvas,
+            fullOrigCanvas: upright,
+            xy: [12, 4],
+            size: [rw, rh],
+            orig: [origW, origH],
+            offset: [offsetX, offsetY],
+            rot: false,
+            index: info.index !== undefined ? info.index : -1,
+            zones: zoneIds
+          };
+        }
+      } else {
+        dynamicPackedAtlas.regions[regName] = {
+          name: regName,
+          used: true,
+          isPassthrough: false,
+          canvas: upright,
+          fullOrigCanvas: upright,
+          xy: [12, 4],
+          size: [origW, origH],
+          orig: [origW, origH],
+          offset: [0, 0],
+          rot: false,
+          index: info.index !== undefined ? info.index : -1,
+          zones: zoneIds
+        };
+      }
+    } else {
+      const rw = Math.min(origW, Math.max(1, Math.round(zMaxX - zMinX)));
+      const rh = Math.min(origH, Math.max(1, Math.round(zMaxY - zMinY)));
+      const upright = document.createElement('canvas');
+      upright.width = rw;
+      upright.height = rh;
+      const uCtx = upright.getContext('2d');
+
+      zoneIds.forEach(zId => {
+        const ex = zoneCache[zId];
+        const zObj = getZoneById(zId);
+        if (!ex || !zObj) return;
+        const tMat = getZoneUserTexMatrix(zObj);
+        uCtx.save();
+        uCtx.setTransform(tMat.a, tMat.b, tMat.c, tMat.d, tMat.e - zMinX, tMat.f - zMinY);
+        if (ex.puttyCanvas) uCtx.drawImage(ex.puttyCanvas, 0, 0);
+        uCtx.drawImage(ex.fullCanvas, 0, 0);
+        uCtx.restore();
+      });
+
+      const offX = Math.max(0, Math.round((origW - rw) / 2));
+      const offY = Math.max(0, Math.round((origH - rh) / 2));
+
+      dynamicPackedAtlas.regions[regName] = {
+        name: regName,
+        used: true,
+        isPassthrough: false,
+        canvas: upright,
+        fullOrigCanvas: upright,
+        xy: [12, 4],
+        size: [rw, rh],
+        orig: [origW, origH],
+        offset: [offX, offY],
+        rot: false,
+        index: info.index !== undefined ? info.index : -1,
+        zones: zoneIds
+      };
+    }
+  }
+
+  const usedList = Object.values(dynamicPackedAtlas.regions).filter(r => r.used && r.canvas);
+  const pad = 4;
+  const maxPartW = usedList.reduce((m, r) => Math.max(m, r.size[0]), 0);
+  const maxSheetWidth = maxPartW > 2000 ? 4096 : 2048;
+
+  let curX = 12, curY = 4, rowH = 0;
+  let totalW = 64, totalH = 64;
+
+  usedList.forEach(reg => {
+    const rw = Math.max(1, reg.size[0]);
+    const rh = Math.max(1, reg.size[1]);
+
+    if (curX + rw + pad > maxSheetWidth && curX > 12) {
+      curX = 12;
+      curY += rowH + pad;
+      rowH = 0;
+    }
+    reg.packedX = curX;
+    reg.packedY = curY;
+    reg.packedW = rw;
+    reg.packedH = rh;
+
+    curX += rw + pad;
+    if (rh > rowH) rowH = rh;
+    if (curX > totalW) totalW = curX;
+    if (curY + rowH + pad > totalH) totalH = curY + rowH + pad;
+  });
+
+  totalW = Math.min(8192, Math.max(64, totalW));
+  totalH = Math.min(8192, Math.max(64, totalH));
+  dynamicPackedAtlas.width = totalW;
+  dynamicPackedAtlas.height = totalH;
+
+  if (atlasCanvas.width !== totalW || atlasCanvas.height !== totalH) {
+    atlasCanvas.width = totalW;
+    atlasCanvas.height = totalH;
+  }
+  aCtx.clearRect(0, 0, totalW, totalH);
+
+  const safeDummyData = aCtx.createImageData(8, 8);
+  aCtx.putImageData(safeDummyData, 0, 0);
+
+  updateExportButtonLabel();
+
+  if (!forExport) {
+    aCtx.save();
+    aCtx.strokeStyle = '#00ffff';
+    aCtx.lineWidth = 1;
+    aCtx.strokeRect(0.5, 0.5, 7, 7);
+    aCtx.fillStyle = '#00ffff';
+    aCtx.fillRect(2, 2, 1, 1);
+    aCtx.restore();
+  }
+
+  usedList.forEach(reg => {
+    aCtx.drawImage(reg.canvas, 0, 0, reg.canvas.width, reg.canvas.height, reg.packedX, reg.packedY, reg.packedW, reg.packedH);
+
+    if (!forExport) {
+      const zKey = reg.zones[0];
+      const zObj = (zKey && zKey !== 'shadow') ? getZoneById(zKey) : null;
+      const col = zObj ? zObj.colorHex : (reg.isPassthrough ? '#8abeb7' : '#aaaaaa');
+      aCtx.save();
+      aCtx.strokeStyle = col;
+      aCtx.lineWidth = 2;
+      aCtx.strokeRect(reg.packedX, reg.packedY, reg.packedW, reg.packedH);
+      aCtx.fillStyle = col;
+      aCtx.font = 'bold 12px sans-serif';
+      const tag = reg.isPassthrough ? '[Host Kept]' : '';
+      aCtx.fillText(`${reg.name}${tag} (${reg.packedW}×${reg.packedH})`, reg.packedX + 4, reg.packedY + 15);
+      aCtx.restore();
+    }
+  });
+}
+
+function renderAll() {
+  renderOutputAtlas(false, false);
+  renderSurgicalView();
+  renderAnimatedPreview();
+}
+
+function getSurgicalMouseCoord(e) {
+  const rect = surgicalCanvas.getBoundingClientRect();
+  const canvasX = (e.clientX - rect.left) * (W / rect.width);
+  const canvasY = (e.clientY - rect.top) * (H / rect.height);
+  return {
+    x: (canvasX - panX) / zoomLevel,
+    y: (canvasY - panY) / zoomLevel
+  };
+}
+
+function findNearestPivotZoneId(mx, my, maxRadiusPx = 26) {
+  const maxDistSq = (maxRadiusPx / zoomLevel) * (maxRadiusPx / zoomLevel);
+  let bestId = null;
+  let bestDistSq = maxDistSq;
+  zonesList.forEach(z => {
+    const p = z.pivot;
+    const dSq = (mx - p.x) * (mx - p.x) + (my - p.y) * (my - p.y);
+    if (dSq <= bestDistSq) {
+      bestDistSq = dSq;
+      bestId = z.id;
+    }
+  });
+  return bestId;
+}
+
+function updateDraggedPivotFromMouse(e) {
+  if (draggingPivotZoneId === null) return;
+  const zObj = getZoneById(draggingPivotZoneId);
+  if (!zObj) return;
+
+  const pt = getSurgicalMouseCoord(e);
+  const cx = Math.max(0, Math.min(W - 1, Math.round(pt.x)));
+  const cy = Math.max(0, Math.min(H - 1, Math.round(pt.y)));
+
+  zObj.pivot.x = cx;
+  zObj.pivot.y = cy;
+
+  const wPt = SPINE_SPACE.toSpineWorld(cx, cy);
+  zObj.pivot.wx = wPt.wx;
+  zObj.pivot.wy = wPt.wy;
+
+  if (parseInt(jointSelect.value, 10) !== zObj.id) {
+    jointSelect.value = String(zObj.id);
+    jointSelect.onchange();
+  }
+
+  renderSurgicalView();
+  renderAnimatedPreview();
+  statusMsg.style.color = '#00ff66';
+  statusMsg.textContent = `🎯 Dragging Pivot [#${zObj.id} ${zObj.name}] -> Canvas: (${cx}, ${cy}) ｜ Spine World: (${Math.round(zObj.pivot.wx)}, ${Math.round(zObj.pivot.wy)})`;
+}
+
+function paintOnSurgicalCanvas(e) {
+  if (interactionMode === 'drag' || draggingPivotZoneId !== null) return;
+  if (!isPainting || !charImg) return;
+
+  const pt = getSurgicalMouseCoord(e);
+  const cx = Math.round(pt.x);
+  const cy = Math.round(pt.y);
+
+  const r = parseInt(document.getElementById('brushSize').value, 10);
+  const maxDistSq = (r === 1) ? 0.25 : r * r;
+
+  const mCenter = SPINE_SPACE.canvasToMaster(cx, cy);
+  const mRadius = Math.max(1, Math.round(r / SPINE_SPACE.scale));
+  const mMaxDistSq = (r === 1) ? 0.5 : mRadius * mRadius;
+
+  if (interactionMode === 'putty_add' || interactionMode === 'putty_erase') {
+    const targetZId = parseInt(jointSelect.value, 10);
+    const zObj = getZoneById(targetZId);
+    if (!zObj) return;
+
+    for (let y = Math.max(0, cy - r); y <= Math.min(H - 1, cy + r); y++) {
+      for (let x = Math.max(0, cx - r); x <= Math.min(W - 1, cx + r); x++) {
+        if ((x - cx) ** 2 + (y - cy) ** 2 <= maxDistSq) {
+          const idx = y * W + x;
+          if (interactionMode === 'putty_add') {
+            puttyMap[idx] = targetZId;
+          } else if (puttyMap[idx] === targetZId) {
+            puttyMap[idx] = 0;
+          }
+        }
+      }
+    }
+
+    for (let y = Math.max(0, mCenter.my - mRadius); y <= Math.min(H - 1, mCenter.my + mRadius); y++) {
+      for (let x = Math.max(0, mCenter.mx - mRadius); x <= Math.min(W - 1, mCenter.mx + mRadius); x++) {
+        if ((x - mCenter.mx) ** 2 + (y - mCenter.my) ** 2 <= mMaxDistSq) {
+          const mIdx = y * W + x;
+          if (interactionMode === 'putty_add') {
+            masterPuttyMap[mIdx] = targetZId;
+          } else if (masterPuttyMap[mIdx] === targetZId) {
+            masterPuttyMap[mIdx] = 0;
+          }
+        }
+      }
+    }
+
+    renderSurgicalView();
+    return;
+  }
+
+  const cData = cleanCtx.getImageData(0, 0, W, H).data;
+  for (let y = Math.max(0, cy - r); y <= Math.min(H - 1, cy + r); y++) {
+    for (let x = Math.max(0, cx - r); x <= Math.min(W - 1, cx + r); x++) {
+      if ((x - cx) ** 2 + (y - cy) ** 2 <= maxDistSq) {
+        const idx = y * W + x;
+        if (currentBrushZone === 0) {
+          zoneMap[idx] = 0;
+        } else if (cData[idx * 4 + 3] > 0) {
+          zoneMap[idx] = currentBrushZone;
+        }
+      }
+    }
+  }
+
+  for (let y = Math.max(0, mCenter.my - mRadius); y <= Math.min(H - 1, mCenter.my + mRadius); y++) {
+    for (let x = Math.max(0, mCenter.mx - mRadius); x <= Math.min(W - 1, mCenter.mx + mRadius); x++) {
+      if ((x - mCenter.mx) ** 2 + (y - mCenter.my) ** 2 <= mMaxDistSq) {
+        const mIdx = y * W + x;
+        masterZoneMap[mIdx] = currentBrushZone;
+      }
+    }
+  }
+
+  renderSurgicalView();
+}
+
+surgicalCanvas.onmousedown = e => {
+  if (e.button === 2 || e.button === 1 || panModeActive) {
+    e.preventDefault();
+    isDraggingPan = true;
+    const rect = surgicalCanvas.getBoundingClientRect();
+    dragStartX = (e.clientX - rect.left) * (W / rect.width);
+    dragStartY = (e.clientY - rect.top) * (H / rect.height);
+    startPanX = panX;
+    startPanY = panY;
+    updateSurgicalCursor();
+    return;
+  }
+  if (e.button === 0) {
+    if (interactionMode === 'drag') {
+      const pt = getSurgicalMouseCoord(e);
+      const hitId = findNearestPivotZoneId(pt.x, pt.y, 32);
+      if (hitId !== null) {
+        saveUndoSnapshot();
+        draggingPivotZoneId = hitId;
+        updateDraggedPivotFromMouse(e);
+        updateSurgicalCursor();
+      } else {
+        statusMsg.style.color = '#f0c674';
+        statusMsg.textContent = '💡 Click directly on any yellow joint pivot circle to drag it';
+      }
+      return;
+    }
+
+    saveUndoSnapshot();
+    isPainting = true;
+    paintOnSurgicalCanvas(e);
+  }
+};
+
+window.onmousemove = e => {
+  if (isDraggingPreviewPan) {
+    const rect = previewCanvas.getBoundingClientRect();
+    const curX = (e.clientX - rect.left) * (W / rect.width);
+    const curY = (e.clientY - rect.top) * (H / rect.height);
+    pPanX = pStartPanX + (curX - pDragStartX);
+    pPanY = pStartPanY + (curY - pDragStartY);
+    clampPreviewPanBounds();
+    renderAnimatedPreview();
+    return;
+  }
+  if (isDraggingPreviewTex) {
+    const rect = previewCanvas.getBoundingClientRect();
+    const curX = (e.clientX - rect.left) * (W / rect.width);
+    const curY = (e.clientY - rect.top) * (H / rect.height);
+    const deltaX = Math.round((curX - pDragStartX) / pZoomLevel);
+    const deltaY = Math.round((curY - pDragStartY) / pZoomLevel);
+
+    const zId = parseInt(document.getElementById('jointSelect').value, 10);
+    const zObj = getZoneById(zId);
+    if (zObj) {
+      zObj.texTune.dx = pStartTexDx + deltaX;
+      zObj.texTune.dy = pStartTexDy + deltaY;
+      syncTexTuneUIFromSelectedZone();
+      scheduleRenderAll(true);
+      statusMsg.style.color = '#ffbe76';
+      statusMsg.textContent = `🔧 Dragging [#${zObj.id} ${zObj.name}] texture offset: ΔX = ${zObj.texTune.dx}px, ΔY = ${zObj.texTune.dy}px`;
+    }
+    return;
+  }
+  if (isDraggingPan) {
+    const rect = surgicalCanvas.getBoundingClientRect();
+    const curX = (e.clientX - rect.left) * (W / rect.width);
+    const curY = (e.clientY - rect.top) * (H / rect.height);
+    panX = startPanX + (curX - dragStartX);
+    panY = startPanY + (curY - dragStartY);
+    clampPanBounds();
+    renderSurgicalView();
+    return;
+  }
+  if (draggingPivotZoneId !== null) {
+    updateDraggedPivotFromMouse(e);
+    return;
+  }
+  if (interactionMode === 'drag' && e.target === surgicalCanvas) {
+    const pt = getSurgicalMouseCoord(e);
+    const nearId = findNearestPivotZoneId(pt.x, pt.y, 32);
+    if (nearId !== hoveredPivotZoneId) {
+      hoveredPivotZoneId = nearId;
+      updateSurgicalCursor();
+      renderSurgicalView();
+    }
+    return;
+  }
+  if (isPainting) {
+    paintOnSurgicalCanvas(e);
+  }
+};
+
+window.onmouseup = () => {
+  if (isDraggingPreviewPan) {
+    isDraggingPreviewPan = false;
+    updatePreviewCursor();
+  }
+  if (isDraggingPreviewTex) {
+    isDraggingPreviewTex = false;
+    renderAll();
+  }
+  if (isDraggingPan) {
+    isDraggingPan = false;
+    updateSurgicalCursor();
+  }
+  if (draggingPivotZoneId !== null) {
+    const finishedId = draggingPivotZoneId;
+    draggingPivotZoneId = null;
+    updateSurgicalCursor();
+    if (charImg) {
+      rebuildZoneCache(finishedId);
+      renderAll();
+    }
+  }
+  if (isPainting) {
+    isPainting = false;
+    if (interactionMode === 'putty_add' || interactionMode === 'putty_erase') {
+      const targetZId = parseInt(jointSelect.value, 10);
+      rebuildZoneCache(targetZId);
+    } else {
+      rebuildZoneCache();
+    }
+    renderAll();
+  }
+};
+
+document.getElementById('animBtn').onclick = e => {
+  isAnimating = !isAnimating;
+  e.target.textContent = isAnimating ? '⏹ Stop Motion Test' : '▶ Play Part Motion Test';
+  if (isAnimating) {
+    const loop = () => {
+      if (!isAnimating) return;
+      animTime += 0.048;
+      renderAnimatedPreview();
+      animId = requestAnimationFrame(loop);
+    };
+    loop();
+  } else {
+    cancelAnimationFrame(animId);
+    renderAnimatedPreview();
+  }
+};
+
+function generateMasterHostAtlasText(customPngFilename) {
+  const pngName = customPngFilename || (getCleanExportBaseName() + '.png');
+
+  const lines = [
+    pngName,
+    `size: ${atlasCanvas.width},${atlasCanvas.height}`,
+    'format: RGBA8888',
+    'filter: Linear,Linear',
+    'repeat: none'
+  ];
+
+  for (const [name, reg] of Object.entries(dynamicPackedAtlas.regions)) {
+    const origW = Math.max(1, Math.round(reg.orig[0]));
+    const origH = Math.max(1, Math.round(reg.orig[1]));
+
+    if (reg.used && reg.canvas) {
+      const offX = Math.round(reg.offset[0]);
+      const offY = Math.round(reg.offset[1]);
+      lines.push(name);
+      lines.push(`  rotate: false`);
+      lines.push(`  xy: ${reg.packedX}, ${reg.packedY}`);
+      lines.push(`  size: ${reg.packedW}, ${reg.packedH}`);
+      lines.push(`  orig: ${origW}, ${origH}`);
+      lines.push(`  offset: ${offX}, ${offY}`);
+      lines.push(`  index: ${reg.index}`);
+    } else {
+      lines.push(name);
+      lines.push(`  rotate: false`);
+      lines.push(`  xy: 2, 2`);
+      lines.push(`  size: 1, 1`);
+      lines.push(`  orig: ${origW}, ${origH}`);
+      lines.push(`  offset: 0, 0`);
+      lines.push(`  index: ${reg.index}`);
+    }
+  }
+  return lines.join('\n') + '\n';
+}
+
+exportAllBtn.onclick = () => {
+  renderOutputAtlas(true, false);
+
+  const baseName = getCleanExportBaseName();
+  const pngFilename = `${baseName}.png`;
+  const atlasFilename = `${baseName}.atlas`;
+  const skelFilename = `${baseName}.skel`;
+  const includeSkel = exportIncludeSkelCb.checked;
+
+  const pngLink = document.createElement('a');
+  pngLink.download = pngFilename;
+  pngLink.href = atlasCanvas.toDataURL('image/png');
+  pngLink.click();
+
+  setTimeout(() => {
+    const atlasText = generateMasterHostAtlasText(pngFilename);
+    const atlasBlob = new Blob([atlasText], { type: 'text/plain;charset=utf-8' });
+    const atlasLink = document.createElement('a');
+    atlasLink.download = atlasFilename;
+    atlasLink.href = URL.createObjectURL(atlasBlob);
+    atlasLink.click();
+
+    if (includeSkel && refSkelRawBuffer) {
+      setTimeout(() => {
+        const skelBlob = new Blob([refSkelRawBuffer], { type: 'application/octet-stream' });
+        const skelLink = document.createElement('a');
+        skelLink.download = skelFilename;
+        skelLink.href = URL.createObjectURL(skelBlob);
+        skelLink.click();
+        renderOutputAtlas(false, false);
+        statusMsg.style.color = '#4cd964';
+        statusMsg.textContent = `✅ Losslessly exported 1:1 3-in-1 bundle: ${pngFilename} + ${atlasFilename} + ${skelFilename}!`;
+      }, 300);
+    } else {
+      renderOutputAtlas(false, false);
+      statusMsg.style.color = '#4cd964';
+      statusMsg.textContent = includeSkel
+        ? `✅ Exported ${pngFilename} + ${atlasFilename} (Note: Host .skel was not uploaded in Section A)`
+        : `✅ Losslessly exported 1:1 2-in-1 bundle: ${pngFilename} + ${atlasFilename}!`;
+    }
+  }, 280);
+};
+
+renderZoneManagerUI();
+renderBrushButtonsUI();
+renderJointSelectUI();
+renderBLayerTogglesUI();
+renderAll();
+</script>
+</body>
+</html>
